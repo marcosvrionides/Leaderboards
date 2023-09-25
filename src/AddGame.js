@@ -25,6 +25,9 @@ const AddGame = ({navigation}) => {
     ) {
       ToastAndroid.show('Please fill out all fields.', ToastAndroid.SHORT);
       return;
+    } else if (!Number.isInteger(player1GamesWon) || !Number.isInteger(player2GamesWon)) {
+      ToastAndroid.show('Invalid input.', ToastAndroid.SHORT);
+      return;
     }
     const game_history_ref = database().ref('/game_history');
     game_history_ref.push({
@@ -60,14 +63,14 @@ const AddGame = ({navigation}) => {
           style={styles.formInput}
           placeholder="Player 2 Name"
           value={player2Name}
-          onChangeText={text => setPlayer2Name(text)}
+          onChangeText={number => setPlayer2Name(number)}
         />
 
         <TextInput
           style={styles.formInput}
           placeholder="Player 1 Games Won"
           value={player1GamesWon}
-          onChangeText={text => setPlayer1GamesWon(text)}
+          onChangeText={number => setPlayer1GamesWon(number)}
           keyboardType="numeric"
         />
 

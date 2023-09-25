@@ -61,8 +61,6 @@ const Leaderboard = () => {
     setLeaderboardData(tempLeaderboardData);
   }, [gameHistoryData]);
 
-  console.log(LeaderboardData);
-
   const dummyLeaderboardData = [
     {id: 1, player: 'John', wins: 10, losses: 5},
     {id: 2, player: 'Alice', wins: 8, losses: 7},
@@ -89,10 +87,10 @@ const Leaderboard = () => {
           <Text style={styles.columnHeader}>Wins</Text>
           <Text style={styles.columnHeader}>Loses</Text>
         </View>
-        {dummyLeaderboardData
-          .slice(0, isExpanded ? dummyLeaderboardData.length : 3)
+        {LeaderboardData
+          .slice(0, isExpanded ? LeaderboardData.length : 3)
           .map((item, index) => (
-            <View style={styles.tableRow} key={item.id}>
+            <View style={styles.tableRow} key={index}>
               <Text style={[styles.tableCell, styles.narrowColumn]}>
                 {index + 1}
               </Text>

@@ -25,7 +25,13 @@ const AddGame = ({navigation}) => {
     ) {
       ToastAndroid.show('Please fill out all fields.', ToastAndroid.SHORT);
       return;
-    } else if (!Number.isInteger(player1GamesWon) || !Number.isInteger(player2GamesWon)) {
+    }
+    if (
+      !(
+        Number.isInteger(player1GamesWon) === false ||
+        Number.isInteger(player2GamesWon) === false
+      )
+    ) {
       ToastAndroid.show('Invalid input.', ToastAndroid.SHORT);
       return;
     }

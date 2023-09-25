@@ -33,6 +33,8 @@ local.properties
 .cxx/
 *.keystore
 !debug.keystore
+**/build/
+**/gradle.properties
 
 # node.js
 #

@@ -1,4 +1,4 @@
-const colors = {
+const colours = {
   text: 'black',
   background: '#F4F0EB',
   primary: '#977953',
@@ -6,4 +6,4 @@ const colors = {
   accent: '#3E3222',
 };
 
-export default colors;
+export default colours;

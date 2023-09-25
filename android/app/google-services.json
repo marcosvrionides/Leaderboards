@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "443083786752",
+    "firebase_url": "https://leaderboards-9c5f0-default-rtdb.europe-west1.firebasedatabase.app",
+    "project_id": "leaderboards-9c5f0",
+    "storage_bucket": "leaderboards-9c5f0.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:443083786752:android:362997f3c5fa6e95a866e5",
+        "android_client_info": {
+          "package_name": "com.backgammon_leaderboards"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAfROyc8PJoWzLjct5q1qKuhqDX9ajCoJQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

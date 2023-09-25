@@ -44,6 +44,9 @@ const GameHistory = () => {
         </View>
         {gameHistoryData
           .slice(0, isExpanded ? gameHistoryData.length : 3)
+          .sort((a, b) => {
+            return b.timestamp - a.timestamp;
+          })
           .map((item, index) => {
             const date = new Date(item.timestamp);
             const formatedDate =

@@ -1,9 +1,67 @@
 import {StyleSheet, Text, TouchableOpacity, View} from 'react-native';
-import React, {useState} from 'react';
-import Colours from './Colours';
+import React, {useState, useEffect} from 'react';
+import colours from './Colours';
+import database from '@react-native-firebase/database';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
 const Leaderboard = () => {
   const [isExpanded, setIsExpanded] = useState(false);
+  const [gameHistoryData, setGameHistoryData] = useState([]);
+  const [LeaderboardData, setLeaderboardData] = useState([]);
+  const [refresh, setRefreshing] = useState(false);
+
+  useEffect(() => {
+    setGameHistoryData([]);
+    setIsExpanded(false);
+    const game_history_ref = database().ref('/game_history');
+    game_history_ref.once('value', snapshot => {
+      snapshot.forEach(childSnapshot => {
+        setGameHistoryData(previousState => [
+          ...previousState,
+          childSnapshot.val(),
+        ]);
+      });
+    });
+  }, [refresh]);
+
+  useEffect(() => {
+    const leaderboardDataMap = {}; // Create an empty object to store leaderboard data
+
+    // Loop through the gameHistoryData
+    for (let i = 0; i < gameHistoryData.length; i++) {
+      const player1Name = gameHistoryData[i].player_1_name;
+      const player2Name = gameHistoryData[i].player_2_name;
+      const player1Wins = parseInt(gameHistoryData[i].player_1_games_won, 10); // Convert to integer
+      const player2Wins = parseInt(gameHistoryData[i].player_2_games_won, 10); // Convert to integer
+
+      // Update player 1's wins in the leaderboardDataMap
+      if (leaderboardDataMap[player1Name]) {
+        leaderboardDataMap[player1Name].wins += player1Wins;
+      } else {
+        leaderboardDataMap[player1Name] = {
+          player: player1Name,
+          wins: parseInt(player1Wins),
+        };
+      }
+
+      // Update player 2's wins in the leaderboardDataMap
+      if (leaderboardDataMap[player2Name]) {
+        leaderboardDataMap[player2Name].wins += player2Wins;
+      } else {
+        leaderboardDataMap[player2Name] = {
+          player: player2Name,
+          wins: parseInt(player2Wins),
+        };
+      }
+    }
+
+    // Convert the leaderboardDataMap object to an array
+    const tempLeaderboardData = Object.values(leaderboardDataMap);
+
+    setLeaderboardData(tempLeaderboardData);
+  }, [gameHistoryData]);
+
+  console.log(LeaderboardData);
 
   const dummyLeaderboardData = [
     {id: 1, player: 'John', wins: 10, losses: 5},
@@ -15,7 +73,16 @@ const Leaderboard = () => {
   return (
     <>
       <View style={styles.container}>
-        <Text style={styles.title}>Leaderboard</Text>
+        <View style={styles.header}>
+          <Text style={styles.title}>Leaderboard</Text>
+          <TouchableOpacity onPress={() => setRefreshing(!refresh)}>
+            <MaterialCommunityIcons
+              name={'refresh'}
+              size={28}
+              color={colours.text}
+            />
+          </TouchableOpacity>
+        </View>
         <View style={styles.tableHeaderRow}>
           <Text style={[styles.columnHeader, styles.narrowColumn]}>#</Text>
           <Text style={styles.columnHeader}>Player</Text>
@@ -38,7 +105,7 @@ const Leaderboard = () => {
       {dummyLeaderboardData.length > 3 && (
         <TouchableOpacity onPress={() => setIsExpanded(!isExpanded)}>
           <Text style={styles.showMoreButtonText}>
-            {isExpanded ? '- hide' : '+ show more'}
+            {isExpanded ? '- less' : '+ more'}
           </Text>
         </TouchableOpacity>
       )}
@@ -50,16 +117,24 @@ export default Leaderboard;
 
 const styles = StyleSheet.create({
   container: {
-    height: 'fit-content',
-    width: '100%',
-    backgroundColor: Colours.secondary,
+    width: '95%',
+    backgroundColor: colours.secondary,
     borderRadius: 10,
     elevation: 7,
     padding: 10,
+    margin: 10,
+    marginBottom: 20,
+  },
+  header: {
+    display: 'flex',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 10,
   },
   title: {
     fontSize: 28,
-    color: Colours.text,
+    color: colours.text,
     fontFamily: 'times new roman',
   },
   tableHeaderRow: {
@@ -74,7 +149,7 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 16,
     fontWeight: 'bold',
-    color: Colours.text,
+    color: colours.text,
     textAlign: 'center',
   },
   narrowColumn: {
@@ -90,12 +165,13 @@ const styles = StyleSheet.create({
   tableCell: {
     flex: 1,
     fontSize: 15,
-    color: Colours.text,
+    color: colours.text,
     textAlign: 'center',
   },
   showMoreButtonText: {
     textAlign: 'center',
-    color: Colours.primary,
+    color: colours.primary,
     fontSize: 14,
+    marginBottom: 10,
   },
 });

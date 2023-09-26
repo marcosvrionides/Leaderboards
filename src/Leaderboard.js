@@ -134,22 +134,22 @@ const Leaderboard = () => {
             </Text>
           </TouchableOpacity>
         </View>
-        {LeaderboardData.slice(0, isExpanded ? LeaderboardData.length : 3)
-          .sort((a, b) => {
-            if (sortBy === 'wins') {
-              if (sortAscending) {
-                return a.wins - b.wins;
-              } else {
-                return b.wins - a.wins;
-              }
-            } else if (sortBy === 'losses') {
-              if (sortAscending) {
-                return a.losses - b.losses;
-              } else {
-                return b.losses - a.losses;
-              }
+        {LeaderboardData.sort((a, b) => {
+          if (sortBy === 'wins') {
+            if (sortAscending) {
+              return a.wins - b.wins;
+            } else {
+              return b.wins - a.wins;
             }
-          })
+          } else if (sortBy === 'losses') {
+            if (sortAscending) {
+              return a.losses - b.losses;
+            } else {
+              return b.losses - a.losses;
+            }
+          }
+        })
+          .slice(0, isExpanded ? LeaderboardData.length : 3)
           .map((item, index) => (
             <View style={styles.tableRow} key={index}>
               <Text style={[styles.tableCell, styles.narrowColumn]}>

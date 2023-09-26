@@ -43,10 +43,10 @@ const GameHistory = () => {
           <Text style={styles.columnHeader}>Player 2</Text>
         </View>
         {gameHistoryData
-          .slice(0, isExpanded ? gameHistoryData.length : 3)
           .sort((a, b) => {
             return b.timestamp - a.timestamp;
           })
+          .slice(0, isExpanded ? gameHistoryData.length : 3)
           .map((item, index) => {
             const date = new Date(item.timestamp);
             const formatedDate =

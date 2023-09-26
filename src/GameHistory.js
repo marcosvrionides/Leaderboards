@@ -4,7 +4,7 @@ import colours from './Colours';
 import database from '@react-native-firebase/database';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
-const GameHistory = () => {
+const GameHistory = ({leaderboardName}) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [gameHistoryData, setGameHistoryData] = useState([]);
   const [refresh, setRefreshing] = useState(false);
@@ -12,7 +12,7 @@ const GameHistory = () => {
   useEffect(() => {
     setGameHistoryData([]);
     setIsExpanded(false);
-    const game_history_ref = database().ref('/game_history');
+    const game_history_ref = database().ref('/' + leaderboardName);
     game_history_ref.once('value', snapshot => {
       snapshot.forEach(childSnapshot => {
         setGameHistoryData(previousState => [

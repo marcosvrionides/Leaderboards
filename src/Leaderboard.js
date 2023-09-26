@@ -5,7 +5,7 @@ import database from '@react-native-firebase/database';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 
-const Leaderboard = () => {
+const Leaderboard = ({leaderboardName}) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [gameHistoryData, setGameHistoryData] = useState([]);
   const [LeaderboardData, setLeaderboardData] = useState([]);
@@ -16,7 +16,7 @@ const Leaderboard = () => {
   useEffect(() => {
     setGameHistoryData([]);
     setIsExpanded(false);
-    const game_history_ref = database().ref('/game_history');
+    const game_history_ref = database().ref('/' + leaderboardName);
     game_history_ref.once('value', snapshot => {
       snapshot.forEach(childSnapshot => {
         setGameHistoryData(previousState => [

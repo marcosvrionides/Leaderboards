@@ -10,7 +10,9 @@ import colours from './Colours';
 import database from '@react-native-firebase/database';
 import {ToastAndroid} from 'react-native';
 
-const AddGame = ({navigation}) => {
+const AddGame = ({navigation, route}) => {
+  const leaderboard = route.params.leaderboard;
+
   const [player1Name, setPlayer1Name] = useState('');
   const [player2Name, setPlayer2Name] = useState('');
   const [player1GamesWon, setPlayer1GamesWon] = useState('');
@@ -35,7 +37,7 @@ const AddGame = ({navigation}) => {
       ToastAndroid.show('Invalid input.', ToastAndroid.SHORT);
       return;
     }
-    const game_history_ref = database().ref('/game_history');
+    const game_history_ref = database().ref('/' + leaderboard);
     game_history_ref.push({
       player_1_name: player1Name,
       player_2_name: player2Name,
@@ -44,14 +46,14 @@ const AddGame = ({navigation}) => {
       timestamp: database.ServerValue.TIMESTAMP,
     });
     ToastAndroid.show('Game Saved.', ToastAndroid.SHORT);
-    navigation.navigate('home');
+    navigation.navigate('home', {leaderboard: leaderboard});
   };
 
   return (
     <View style={styles.container}>
       <TouchableOpacity
         style={styles.cancelButtonContainer}
-        onPress={() => navigation.navigate('home')}>
+        onPress={() => navigation.navigate('home', {leaderboard: leaderboard})}>
         <Text style={styles.cancelButtonText}>Cancel</Text>
       </TouchableOpacity>
 

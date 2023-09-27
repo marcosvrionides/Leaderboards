@@ -61,6 +61,7 @@ export default SelectLeaderboard;
 
 const styles = StyleSheet.create({
   container: {
+    backgroundColor: colours.background,
     height: '100%',
     display: 'flex',
     flexDirection: 'column',

@@ -63,6 +63,7 @@ const AddGame = ({navigation, route}) => {
         <TextInput
           style={styles.formInput}
           placeholder="Player 1 Name"
+          placeholderTextColor={colours.light_text}
           value={player1Name}
           onChangeText={text => setPlayer1Name(text)}
         />
@@ -70,6 +71,7 @@ const AddGame = ({navigation, route}) => {
         <TextInput
           style={styles.formInput}
           placeholder="Player 2 Name"
+          placeholderTextColor={colours.light_text}
           value={player2Name}
           onChangeText={number => setPlayer2Name(number)}
         />
@@ -77,6 +79,7 @@ const AddGame = ({navigation, route}) => {
         <TextInput
           style={styles.formInput}
           placeholder="Player 1 Games Won"
+          placeholderTextColor={colours.light_text}
           value={player1GamesWon}
           onChangeText={number => setPlayer1GamesWon(number)}
           keyboardType="numeric"
@@ -85,6 +88,7 @@ const AddGame = ({navigation, route}) => {
         <TextInput
           style={styles.formInput}
           placeholder="Player 2 Games Won"
+          placeholderTextColor={colours.light_text}
           value={player2GamesWon}
           onChangeText={text => setPlayer2GamesWon(text)}
           keyboardType="numeric"
@@ -143,7 +147,8 @@ const styles = StyleSheet.create({
   },
 
   formInput: {
-    backgroundColor: 'white',
+    backgroundColor: colours.background,
+    color: colours.text,
     marginVertical: 10,
     padding: 10,
     borderRadius: 5,

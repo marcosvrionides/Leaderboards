@@ -58,11 +58,11 @@ const GameHistory = ({leaderboardName}) => {
             return (
               <View style={styles.tableRow} key={index}>
                 <Text style={styles.tableCell}>{formatedDate}</Text>
-                <Text style={styles.tableCell}>{item.player_1_name}</Text>
+                <Text style={styles.tableCell}>{item.player_1_name}{item.player_1_games_won > item.player_2_games_won && ' 👑'}</Text>
                 <Text style={styles.tableCell}>
                   {item.player_1_games_won} - {item.player_2_games_won}
                 </Text>
-                <Text style={styles.tableCell}>{item.player_2_name}</Text>
+                <Text style={styles.tableCell}>{item.player_2_name}{item.player_1_games_won < item.player_2_games_won && ' 👑'}</Text>
               </View>
             );
           })}

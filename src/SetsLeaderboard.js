@@ -127,6 +127,7 @@ const SetsLeaderboard = ({leaderboardName}) => {
           <Text style={[styles.columnHeader, styles.columnHeaderText]}>
             Player
           </Text>
+
           <TouchableOpacity
             style={styles.columnHeader}
             onPress={() => {
@@ -147,6 +148,7 @@ const SetsLeaderboard = ({leaderboardName}) => {
               Wins
             </Text>
           </TouchableOpacity>
+
           <TouchableOpacity
             style={styles.columnHeader}
             onPress={() => {

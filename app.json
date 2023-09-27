@@ -1,4 +1,8 @@
 {
   "name": "Backgammon_Leaderboards",
-  "displayName": "Backgammon_Leaderboards"
+  "displayName": "Backgammon_Leaderboards",
+
+  "react-native-google-mobile-ads": {
+    "android_app_id": "ca-app-pub-7497957931538271~2653020475"
+  }
 }

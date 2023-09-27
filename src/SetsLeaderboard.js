@@ -5,7 +5,7 @@ import database from '@react-native-firebase/database';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 
-const Leaderboard = ({leaderboardName}) => {
+const SetsLeaderboard = ({leaderboardName}) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [gameHistoryData, setGameHistoryData] = useState([]);
   const [LeaderboardData, setLeaderboardData] = useState([]);
@@ -36,28 +36,47 @@ const Leaderboard = ({leaderboardName}) => {
       const player2Name = gameHistoryData[i].player_2_name;
       const player1Wins = parseInt(gameHistoryData[i].player_1_games_won, 10); // Convert to integer
       const player2Wins = parseInt(gameHistoryData[i].player_2_games_won, 10); // Convert to integer
+      const winner = player1Wins > player2Wins ? player1Name : player2Name;
 
       // Update player 1's wins in the leaderboardDataMap
       if (leaderboardDataMap[player1Name]) {
-        leaderboardDataMap[player1Name].wins += player1Wins;
-        leaderboardDataMap[player1Name].losses += player2Wins;
+        if (winner === player1Name) {
+          leaderboardDataMap[player1Name].wins += 1;
+        } else {
+          leaderboardDataMap[player1Name].losses += 1;
+        }
+      } else if (winner === player1Name) {
+        leaderboardDataMap[player1Name] = {
+          player: player1Name,
+          wins: 1,
+          losses: 0,
+        };
       } else {
         leaderboardDataMap[player1Name] = {
           player: player1Name,
-          wins: parseInt(player1Wins),
-          losses: parseInt(player2Wins),
+          wins: 0,
+          losses: 1,
         };
       }
 
       // Update player 2's wins in the leaderboardDataMap
       if (leaderboardDataMap[player2Name]) {
-        leaderboardDataMap[player2Name].wins += player2Wins;
-        leaderboardDataMap[player2Name].losses += player1Wins;
+        if (winner === player2Name) {
+          leaderboardDataMap[player2Name].wins += 1;
+        } else {
+          leaderboardDataMap[player2Name].losses += 1;
+        }
+      } else if (winner === player2Name) {
+        leaderboardDataMap[player2Name] = {
+          player: player2Name,
+          wins: 1,
+          losses: 0,
+        };
       } else {
         leaderboardDataMap[player2Name] = {
           player: player2Name,
-          wins: parseInt(player2Wins),
-          losses: parseInt(player1Wins),
+          wins: 0,
+          losses: 1,
         };
       }
     }
@@ -72,7 +91,7 @@ const Leaderboard = ({leaderboardName}) => {
     <>
       <View style={styles.container}>
         <View style={styles.header}>
-          <Text style={styles.title}>Individual Games Rankings</Text>
+          <Text style={styles.title}>Sets Rankings</Text>
           <TouchableOpacity onPress={() => setRefreshing(!refresh)}>
             <MaterialCommunityIcons
               name={'refresh'}
@@ -172,7 +191,7 @@ const Leaderboard = ({leaderboardName}) => {
   );
 };
 
-export default Leaderboard;
+export default SetsLeaderboard;
 
 const styles = StyleSheet.create({
   container: {

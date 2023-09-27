@@ -8,6 +8,7 @@ import {
 import React from 'react';
 import colours from './Colours';
 import Leaderboard from './Leaderboard';
+import SetsLeaderboard from './SetsLeaderboard';
 import GameHistory from './GameHistory';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
@@ -28,8 +29,9 @@ const Home = ({navigation, route}) => {
         <Text style={styles.title}>{leaderboard}</Text>
       </View>
       <ScrollView style={styles.scrollView}>
-        <Leaderboard leaderboardName={leaderboard}/>
         <GameHistory leaderboardName={leaderboard}/>
+        <SetsLeaderboard leaderboardName={leaderboard}/>
+        <Leaderboard leaderboardName={leaderboard}/>
       </ScrollView>
       <TouchableOpacity
         style={styles.addGameButton}

@@ -19,10 +19,12 @@ const SetsLeaderboard = ({leaderboardName}) => {
     const game_history_ref = database().ref('/' + leaderboardName);
     game_history_ref.once('value', snapshot => {
       snapshot.forEach(childSnapshot => {
-        setGameHistoryData(previousState => [
-          ...previousState,
-          childSnapshot.val(),
-        ]);
+        if (childSnapshot.key !== 'password') {
+          setGameHistoryData(previousState => [
+            ...previousState,
+            childSnapshot.val(),
+          ]);
+        }
       });
     });
   }, [refresh]);

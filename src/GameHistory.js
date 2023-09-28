@@ -15,10 +15,12 @@ const GameHistory = ({leaderboardName}) => {
     const game_history_ref = database().ref('/' + leaderboardName);
     game_history_ref.once('value', snapshot => {
       snapshot.forEach(childSnapshot => {
-        setGameHistoryData(previousState => [
-          ...previousState,
-          childSnapshot.val(),
-        ]);
+        if (childSnapshot.key !== 'password') {
+          setGameHistoryData(previousState => [
+            ...previousState,
+            childSnapshot.val(),
+          ]);
+        }
       });
     });
   }, [refresh]);
@@ -58,11 +60,17 @@ const GameHistory = ({leaderboardName}) => {
             return (
               <View style={styles.tableRow} key={index}>
                 <Text style={styles.tableCell}>{formatedDate}</Text>
-                <Text style={styles.tableCell}>{item.player_1_name}{item.player_1_games_won > item.player_2_games_won && ' 👑'}</Text>
+                <Text style={styles.tableCell}>
+                  {item.player_1_name}
+                  {item.player_1_games_won > item.player_2_games_won && ' 👑'}
+                </Text>
                 <Text style={styles.tableCell}>
                   {item.player_1_games_won} - {item.player_2_games_won}
                 </Text>
-                <Text style={styles.tableCell}>{item.player_2_name}{item.player_1_games_won < item.player_2_games_won && ' 👑'}</Text>
+                <Text style={styles.tableCell}>
+                  {item.player_2_name}
+                  {item.player_1_games_won < item.player_2_games_won && ' 👑'}
+                </Text>
               </View>
             );
           })}

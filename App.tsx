@@ -5,6 +5,7 @@ import Home from './src/Home';
 import AddGame from './src/AddGame';
 import SelectLeaderboard from './src/SelectLeaderboard';
 import {GAMBannerAd, BannerAdSize} from 'react-native-google-mobile-ads';
+import NewLeaderboardForm from './src/NewLeaderboardForm';
 
 const App = () => {
   const Stack = createNativeStackNavigator();
@@ -35,6 +36,11 @@ const App = () => {
           <Stack.Screen
             name="addGame"
             component={AddGame}
+            options={{headerShown: false}}
+          />
+          <Stack.Screen
+            name="addLeaderboard"
+            component={NewLeaderboardForm}
             options={{headerShown: false}}
           />
         </Stack.Navigator>

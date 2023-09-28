@@ -11,16 +11,27 @@ import database from '@react-native-firebase/database';
 
 const SelectLeaderboard = ({navigation}) => {
   const [leaderboards, setLeaderboards] = useState([]);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [filteredLeaderboards, setFilteredLeaderboards] = useState([]);
 
   useEffect(() => {
     const leaderboardsRef = database().ref('/');
-    setLeaderboards([]);
-    leaderboardsRef.once('value', snapshot => {
+    leaderboardsRef.on('value', snapshot => {
+      setLeaderboards([]);
       snapshot.forEach(childSnapshot => {
         setLeaderboards(prevState => [...prevState, childSnapshot.key]);
+        setFilteredLeaderboards(prevState => [...prevState, childSnapshot.key]);
       });
     });
   }, []);
+
+  const handleSearch = (text) => {
+    setSearchQuery(text);
+    const filtered = leaderboards.filter((leaderboard) =>
+      leaderboard.toLowerCase().includes(text.toLowerCase())
+    );
+    setFilteredLeaderboards(filtered);
+  };
 
   return (
     <View style={styles.container}>
@@ -33,7 +44,8 @@ const SelectLeaderboard = ({navigation}) => {
             justifyContent: 'space-between',
           }}>
           <Text style={[styles.title, {width: 'auto'}]}>Leaderboards</Text>
-          <TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => navigation.navigate('addLeaderboard')}>
             <Text style={styles.plusButtonText}>+</Text>
           </TouchableOpacity>
         </View>
@@ -41,13 +53,17 @@ const SelectLeaderboard = ({navigation}) => {
           style={styles.searchContainer}
           placeholder="Search..."
           placeholderTextColor={colours.background}
+          onChangeText={handleSearch} // Bind the onChangeText to the search function
+          value={searchQuery} 
         />
         <View style={styles.leaderboardsSubContainer}>
-          {leaderboards.map((leaderboard, index) => (
+          {filteredLeaderboards.map((leaderboard, index) => (
             <TouchableOpacity
               key={index} // Add a unique key prop for each item in the list
               style={styles.game}
-              onPress={() => navigation.navigate('home', {leaderboard: leaderboard})}>
+              onPress={() =>
+                navigation.navigate('home', {leaderboard: leaderboard})
+              }>
               <Text style={styles.gameText}>{leaderboard}</Text>
             </TouchableOpacity>
           ))}

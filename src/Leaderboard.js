@@ -180,6 +180,12 @@ const Leaderboard = ({leaderboardName}) => {
             } else {
               return b.losses - a.losses;
             }
+          } else if (sortBy === 'winRate') {
+            if (sortAscending) {
+              return a.winRate - b.winRate;
+            } else {
+              return b.winRate - a.winRate;
+            }
           }
         })
           .slice(0, isExpanded ? LeaderboardData.length : 3)

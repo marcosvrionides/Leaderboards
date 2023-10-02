@@ -9,7 +9,8 @@ import React, {useState} from 'react';
 import {useFocusEffect} from '@react-navigation/native';
 import colours from './Colours';
 import database from '@react-native-firebase/database';
-import {GAMBannerAd, BannerAdSize} from 'react-native-google-mobile-ads';
+import {GAMBannerAd} from 'react-native-google-mobile-ads';
+import AntDesign from 'react-native-vector-icons/AntDesign';
 
 const SelectLeaderboard = ({navigation}) => {
   const [leaderboards, setLeaderboards] = useState([]);
@@ -44,14 +45,18 @@ const SelectLeaderboard = ({navigation}) => {
 
   return (
     <View style={styles.container}>
-      <TextInput
-        style={styles.searchBar}
-        placeholder="Search..."
-        placeholderTextColor={colours.text}
-        onChangeText={handleSearch}
-        value={searchQuery}
-      />
       <View style={styles.leaderboardsContainer}>
+        <View style={styles.searchBar}>
+          <AntDesign name={'search1'} color={colours.light_text} size={18} />
+          <TextInput
+            placeholder={'Search...'}
+            placeholderTextColor={colours.light_text}
+            fontSize={18}
+            onChangeText={handleSearch}
+            value={searchQuery}
+          />
+        </View>
+        <Text style={styles.recentText}>{searchQuery.length > 0 ? 'Search:' : 'Recent:'}</Text>
         {filteredLeaderboards.slice(0, 3).map((leaderboard, index) => (
           <TouchableOpacity
             key={index}
@@ -73,9 +78,7 @@ const SelectLeaderboard = ({navigation}) => {
       <TouchableOpacity
         onPress={() => navigation.navigate('addLeaderboard')}
         style={styles.newLeaderboardContainer}>
-        <Text style={styles.newLeaderboardButtonText}>
-          + Create New Leaderboard
-        </Text>
+        <Text style={styles.newLeaderboardButtonText}>+</Text>
       </TouchableOpacity>
     </View>
   );
@@ -100,6 +103,10 @@ const styles = StyleSheet.create({
     color: colours.text,
     fontSize: 28,
     elevation: 7,
+    display: 'flex',
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   leaderboardsContainer: {
     width: '100%',
@@ -118,21 +125,29 @@ const styles = StyleSheet.create({
     elevation: 7,
   },
   gameText: {
-    fontSize: 25,
+    fontSize: 20,
     color: colours.text,
   },
   newLeaderboardContainer: {
     backgroundColor: colours.secondary,
-    width: '100%',
+    width: '20%',
+    aspectRatio: 1,
     elevation: 7,
-    borderRadius: 10,
+    borderRadius: 50,
     position: 'absolute',
-    bottom: 10,
+    bottom: 20,
+    right: 20,
+    justifyContent: 'center',
   },
   newLeaderboardButtonText: {
-    fontSize: 28,
+    fontSize: 25,
     color: colours.text,
     padding: 10,
     textAlign: 'center',
   },
+  recentText: {
+    fontSize: 18,
+    marginTop: 15,
+    color: colours.text
+  }
 });

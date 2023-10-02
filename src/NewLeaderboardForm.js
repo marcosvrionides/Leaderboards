@@ -4,6 +4,7 @@ import {
   View,
   TouchableOpacity,
   TextInput,
+  ToastAndroid,
 } from 'react-native';
 import React, {useState} from 'react';
 import colours from './Colours';
@@ -13,11 +14,32 @@ import database from '@react-native-firebase/database';
 const NewLeaderboardForm = ({navigation}) => {
   const [leaderboardName, setLeaderboardName] = useState('');
   const [leaderboardPassword, setLeaderboardPassword] = useState('');
+  const [nameInUse, setNameInUse] = useState(false);
+
+  const handleChangeLeaderboardName = text => {
+    setLeaderboardName(text);
+    const databaseRef = database().ref('/' + text);
+    databaseRef.once('value', snapshot => {
+      if (snapshot.exists()) {
+        setNameInUse(true);
+      } else {
+        setNameInUse(false);
+      }
+    });
+  };
 
   const saveLeaderboard = () => {
-    const databaseRef = database().ref('/' + leaderboardName+'/password');
-    databaseRef.push(leaderboardPassword)
-    navigation.navigate('home', {leaderboard: leaderboardName})
+    if (nameInUse) {
+      ToastAndroid.show('This name is already in use.', ToastAndroid.SHORT);
+      return;
+    }
+    if (leaderboardPassword.trim() === '') {
+      ToastAndroid.show('Please enter a password', ToastAndroid.SHORT)
+      return;
+    }
+    const databaseRef = database().ref('/' + leaderboardName + '/password');
+    databaseRef.push(leaderboardPassword);
+    navigation.navigate('home', {leaderboard: leaderboardName});
   };
 
   return (
@@ -35,11 +57,14 @@ const NewLeaderboardForm = ({navigation}) => {
       </View>
       <View style={styles.formContainer}>
         <TextInput
-          style={styles.formInput}
+          style={[
+            styles.formInput,
+            nameInUse && styles.errorBorder, // Apply error border style conditionally
+          ]}
           placeholder="Leaderboard Name"
           placeholderTextColor={colours.light_text}
           value={leaderboardName}
-          onChangeText={text => setLeaderboardName(text)}
+          onChangeText={text => handleChangeLeaderboardName(text)}
         />
 
         <TextInput
@@ -112,5 +137,9 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     padding: 15,
     paddingHorizontal: 30,
+  },
+  errorBorder: {
+    borderWidth: 2,
+    borderColor: 'red', // Red border for error state
   },
 });

@@ -1,11 +1,13 @@
 import {
+  Keyboard,
   StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
+  TouchableWithoutFeedback,
   View,
 } from 'react-native';
-import React, {useState} from 'react';
+import React, {useRef, useState} from 'react';
 import {useFocusEffect} from '@react-navigation/native';
 import colours from './Colours';
 import database from '@react-native-firebase/database';
@@ -16,6 +18,8 @@ const SelectLeaderboard = ({navigation}) => {
   const [leaderboards, setLeaderboards] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [filteredLeaderboards, setFilteredLeaderboards] = useState([]);
+
+  const searchInputRef = useRef(null);
 
   useFocusEffect(
     React.useCallback(() => {
@@ -44,43 +48,58 @@ const SelectLeaderboard = ({navigation}) => {
   };
 
   return (
-    <View style={styles.container}>
-      <View style={styles.leaderboardsContainer}>
-        <View style={styles.searchBar}>
-          <AntDesign name={'search1'} color={colours.light_text} size={18} />
-          <TextInput
-            placeholder={'Search...'}
-            placeholderTextColor={colours.light_text}
-            fontSize={18}
-            onChangeText={handleSearch}
-            value={searchQuery}
+    <TouchableWithoutFeedback
+      onPress={() => {
+        Keyboard.dismiss();
+      }}>
+      <View style={styles.container}>
+        <View style={styles.leaderboardsContainer}>
+          <TouchableWithoutFeedback
+            onPress={() => searchInputRef.current.focus()}>
+            <View style={styles.searchBar}>
+              <AntDesign
+                name={'search1'}
+                color={colours.light_text}
+                size={18}
+              />
+              <TextInput
+                ref={searchInputRef}
+                placeholder={'Search...'}
+                placeholderTextColor={colours.light_text}
+                fontSize={18}
+                onChangeText={handleSearch}
+                value={searchQuery}
+              />
+            </View>
+          </TouchableWithoutFeedback>
+          <Text style={styles.recentText}>
+            {searchQuery.length > 0 ? 'Search:' : 'Recent:'}
+          </Text>
+          {filteredLeaderboards.slice(0, 3).map((leaderboard, index) => (
+            <TouchableOpacity
+              key={index}
+              style={styles.game}
+              onPress={() =>
+                navigation.navigate('home', {leaderboard: leaderboard})
+              }>
+              <Text style={styles.gameText}>{leaderboard}</Text>
+            </TouchableOpacity>
+          ))}
+        </View>
+        <View style={{borderWidth: 2, marginTop: 30}}>
+          <GAMBannerAd
+            unitId={'ca-app-pub-7497957931538271/8908530578'}
+            sizes={['300x300']}
+            onAdFailedToLoad={onAdFailedToLoad}
           />
         </View>
-        <Text style={styles.recentText}>{searchQuery.length > 0 ? 'Search:' : 'Recent:'}</Text>
-        {filteredLeaderboards.slice(0, 3).map((leaderboard, index) => (
-          <TouchableOpacity
-            key={index}
-            style={styles.game}
-            onPress={() =>
-              navigation.navigate('home', {leaderboard: leaderboard})
-            }>
-            <Text style={styles.gameText}>{leaderboard}</Text>
-          </TouchableOpacity>
-        ))}
+        <TouchableOpacity
+          onPress={() => navigation.navigate('addLeaderboard')}
+          style={styles.newLeaderboardContainer}>
+          <Text style={styles.newLeaderboardButtonText}>+</Text>
+        </TouchableOpacity>
       </View>
-      <View style={{borderWidth: 2, marginTop: 30}}>
-        <GAMBannerAd
-          unitId={'ca-app-pub-7497957931538271/8908530578'}
-          sizes={['300x300']}
-          onAdFailedToLoad={onAdFailedToLoad}
-        />
-      </View>
-      <TouchableOpacity
-        onPress={() => navigation.navigate('addLeaderboard')}
-        style={styles.newLeaderboardContainer}>
-        <Text style={styles.newLeaderboardButtonText}>+</Text>
-      </TouchableOpacity>
-    </View>
+    </TouchableWithoutFeedback>
   );
 };
 
@@ -148,6 +167,6 @@ const styles = StyleSheet.create({
   recentText: {
     fontSize: 18,
     marginTop: 15,
-    color: colours.text
-  }
+    color: colours.text,
+  },
 });

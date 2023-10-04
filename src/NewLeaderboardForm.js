@@ -34,7 +34,7 @@ const NewLeaderboardForm = ({navigation}) => {
       return;
     }
     if (leaderboardPassword.trim() === '') {
-      ToastAndroid.show('Please enter a password', ToastAndroid.SHORT)
+      ToastAndroid.show('Please enter a password', ToastAndroid.SHORT);
       return;
     }
     const databaseRef = database().ref('/' + leaderboardName + '/password');
@@ -46,10 +46,11 @@ const NewLeaderboardForm = ({navigation}) => {
     <View style={styles.container}>
       <View style={styles.titleContainer}>
         <TouchableOpacity
+          style={styles.backArrow}
           onPress={() => navigation.navigate('selectLeaderboard')}>
           <MaterialCommunityIcons
             name={'arrow-left'}
-            size={28}
+            size={20}
             color={colours.text}
           />
         </TouchableOpacity>
@@ -90,34 +91,38 @@ const styles = StyleSheet.create({
   container: {
     backgroundColor: colours.background,
     height: '100%',
-    padding: 10,
   },
   titleContainer: {
     display: 'flex',
     flexDirection: 'row',
-    justifyContent: 'flex-start',
+    justifyContent: 'center',
     alignItems: 'center',
     paddingHorizontal: 10,
+    position: 'relative',
+    backgroundColor: colours.background,
+    elevation: 5,
   },
   title: {
-    fontFamily: 'times new roman',
-    fontSize: 30,
-    fontWeight: 'bold',
+    fontSize: 20,
     color: colours.text,
     padding: 10,
   },
+  backArrow: {
+    position: 'absolute',
+    left: 20,
+  },
   formContainer: {
-    backgroundColor: colours.secondary,
+    backgroundColor: colours.lighter_background,
     position: 'absolute',
     top: '20%',
-    width: '95%',
+    width: '90%',
     margin: 20,
     borderRadius: 10,
     elevation: 7,
     padding: 10,
   },
   formInput: {
-    backgroundColor: colours.background,
+    backgroundColor: colours.primary,
     color: colours.text,
     marginVertical: 10,
     padding: 10,
@@ -133,7 +138,7 @@ const styles = StyleSheet.create({
   },
   saveButtonText: {
     fontSize: 20,
-    color: colours.background,
+    color: colours.text,
     textAlign: 'center',
     padding: 15,
     paddingHorizontal: 30,

@@ -19,25 +19,28 @@ const Home = ({navigation, route}) => {
     <View style={styles.container}>
       <View style={styles.titleContainer}>
         <TouchableOpacity
+          style={styles.backArrow}
           onPress={() => navigation.navigate('selectLeaderboard')}>
           <MaterialCommunityIcons
             name={'arrow-left'}
-            size={28}
+            size={20}
             color={colours.text}
           />
         </TouchableOpacity>
         <Text style={styles.title}>{leaderboard}</Text>
+        <TouchableOpacity
+          style={styles.addGameButton}
+          onPress={() =>
+            navigation.navigate('addGame', {leaderboard: leaderboard})
+          }>
+          <Text style={styles.addGameButtonText}>+</Text>
+        </TouchableOpacity>
       </View>
       <ScrollView style={styles.scrollView}>
-        <GameHistory leaderboardName={leaderboard}/>
-        <SetsLeaderboard leaderboardName={leaderboard}/>
-        <Leaderboard leaderboardName={leaderboard}/>
+        <GameHistory leaderboardName={leaderboard} />
+        <SetsLeaderboard leaderboardName={leaderboard} />
+        <Leaderboard leaderboardName={leaderboard} />
       </ScrollView>
-      <TouchableOpacity
-        style={styles.addGameButton}
-        onPress={() => navigation.navigate('addGame', {leaderboard: leaderboard})}>
-        <Text style={styles.addGameButtonText}>Add game</Text>
-      </TouchableOpacity>
     </View>
   );
 };
@@ -53,28 +56,28 @@ const styles = StyleSheet.create({
   titleContainer: {
     display: 'flex',
     flexDirection: 'row',
-    justifyContent: 'flex-start',
+    justifyContent: 'center',
     alignItems: 'center',
     paddingHorizontal: 10,
+    position: 'relative',
+    backgroundColor: colours.background,
+    elevation: 5,
   },
   title: {
-    fontFamily: 'times new roman',
-    fontSize: 30,
-    fontWeight: 'bold',
+    fontSize: 20,
     color: colours.text,
     padding: 10,
   },
+  backArrow: {
+    position: 'absolute',
+    left: 20,
+  },
   addGameButton: {
-    width: '95%',
-    margin: 10,
-    backgroundColor: colours.secondary,
-    borderRadius: 10,
-    elevation: 7,
+    position: 'absolute',
+    right: 20,
   },
   addGameButtonText: {
     fontSize: 20,
     color: colours.text,
-    textAlign: 'center',
-    padding: 15,
   },
 });

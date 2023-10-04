@@ -82,135 +82,140 @@ const Leaderboard = ({leaderboardName}) => {
   }, [gameHistoryData]);
 
   return (
-    <>
-      <View style={styles.container}>
-        <View style={styles.header}>
-          <Text style={styles.title}>Individual Games Rankings</Text>
-          <TouchableOpacity onPress={() => setRefreshing(!refresh)}>
-            <MaterialCommunityIcons
-              name={'refresh'}
-              size={28}
-              color={colours.text}
-            />
-          </TouchableOpacity>
-        </View>
-        <View style={styles.tableHeaderRow}>
-          <Text
-            style={[
-              styles.columnHeader,
-              styles.columnHeaderText,
-              styles.narrowColumn,
-            ]}>
-            #
-          </Text>
-          <Text style={[styles.columnHeader, styles.columnHeaderText]}>
-            Player
-          </Text>
-          <TouchableOpacity
-            style={styles.columnHeader}
-            onPress={() => {
-              setSortBy('wins');
-              setSortAscending(sortBy !== 'wins' ? false : !sortAscending);
-            }}>
-            <Text style={styles.columnHeaderText}>
-              {sortBy === 'wins' && (
-                <FontAwesome5
-                  name={
-                    sortAscending
-                      ? 'sort-amount-up-alt'
-                      : 'sort-amount-down-alt'
-                  }
-                  color={colours.text}
-                />
-              )}{' '}
-              Wins
-            </Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={styles.columnHeader}
-            onPress={() => {
-              setSortBy('losses');
-              setSortAscending(sortBy !== 'losses' ? false : !sortAscending);
-            }}>
-            <Text style={styles.columnHeaderText}>
-              {sortBy === 'losses' && (
-                <FontAwesome5
-                  name={
-                    sortAscending
-                      ? 'sort-amount-up-alt'
-                      : 'sort-amount-down-alt'
-                  }
-                  color={colours.text}
-                />
-              )}{' '}
-              Losses
-            </Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={styles.columnHeader}
-            onPress={() => {
-              setSortBy('winRate');
-              setSortAscending(sortBy !== 'winRate' ? false : !sortAscending);
-            }}>
-            <Text style={styles.columnHeaderText}>
-              {sortBy === 'winRate' && (
-                <FontAwesome5
-                  name={
-                    sortAscending
-                      ? 'sort-amount-up-alt'
-                      : 'sort-amount-down-alt'
-                  }
-                  color={colours.text}
-                />
-              )}{' '}
-              Win Rate
-            </Text>
-          </TouchableOpacity>
-        </View>
-        {LeaderboardData.sort((a, b) => {
-          if (sortBy === 'wins') {
-            if (sortAscending) {
-              return a.wins - b.wins;
-            } else {
-              return b.wins - a.wins;
-            }
-          } else if (sortBy === 'losses') {
-            if (sortAscending) {
-              return a.losses - b.losses;
-            } else {
-              return b.losses - a.losses;
-            }
-          } else if (sortBy === 'winRate') {
-            if (sortAscending) {
-              return a.winRate - b.winRate;
-            } else {
-              return b.winRate - a.winRate;
-            }
-          }
-        })
-          .slice(0, isExpanded ? LeaderboardData.length : 3)
-          .map((item, index) => (
-            <View style={styles.tableRow} key={index}>
-              <Text style={[styles.tableCell, styles.narrowColumn]}>
-                {index + 1}
-              </Text>
-              <Text style={styles.tableCell}>{item.player}</Text>
-              <Text style={styles.tableCell}>{item.wins}</Text>
-              <Text style={styles.tableCell}>{item.losses}</Text>
-              <Text style={styles.tableCell}>{item.winRate}%</Text>
-            </View>
-          ))}
+    <View style={styles.container}>
+      <View style={styles.header}>
+        <Text style={styles.title}>Individual Games Rankings</Text>
+        <TouchableOpacity onPress={() => setRefreshing(!refresh)}>
+          <MaterialCommunityIcons
+            name={'refresh'}
+            size={28}
+            color={colours.text}
+          />
+        </TouchableOpacity>
       </View>
+      <View style={styles.tableHeaderRow}>
+        <Text
+          style={[
+            styles.columnHeader,
+            styles.columnHeaderText,
+            styles.narrowColumn,
+          ]}>
+          #
+        </Text>
+        <Text style={[styles.columnHeader, styles.columnHeaderText]}>
+          Player
+        </Text>
+        <TouchableOpacity
+          style={styles.columnHeader}
+          onPress={() => {
+            setSortBy('wins');
+            setSortAscending(sortBy !== 'wins' ? false : !sortAscending);
+          }}>
+          <Text style={styles.columnHeaderText}>
+            {sortBy === 'wins' && (
+              <FontAwesome5
+                name={
+                  sortAscending ? 'sort-amount-up-alt' : 'sort-amount-down-alt'
+                }
+                color={colours.text}
+              />
+            )}{' '}
+            Wins
+          </Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={styles.columnHeader}
+          onPress={() => {
+            setSortBy('losses');
+            setSortAscending(sortBy !== 'losses' ? false : !sortAscending);
+          }}>
+          <Text style={styles.columnHeaderText}>
+            {sortBy === 'losses' && (
+              <FontAwesome5
+                name={
+                  sortAscending ? 'sort-amount-up-alt' : 'sort-amount-down-alt'
+                }
+                color={colours.text}
+              />
+            )}{' '}
+            Losses
+          </Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={styles.columnHeader}
+          onPress={() => {
+            setSortBy('winRate');
+            setSortAscending(sortBy !== 'winRate' ? false : !sortAscending);
+          }}>
+          <Text style={styles.columnHeaderText}>
+            {sortBy === 'winRate' && (
+              <FontAwesome5
+                name={
+                  sortAscending ? 'sort-amount-up-alt' : 'sort-amount-down-alt'
+                }
+                color={colours.text}
+              />
+            )}{' '}
+            Win Rate
+          </Text>
+        </TouchableOpacity>
+      </View>
+      {LeaderboardData.sort((a, b) => {
+        if (sortBy === 'wins') {
+          if (sortAscending) {
+            return a.wins - b.wins;
+          } else {
+            return b.wins - a.wins;
+          }
+        } else if (sortBy === 'losses') {
+          if (sortAscending) {
+            return a.losses - b.losses;
+          } else {
+            return b.losses - a.losses;
+          }
+        } else if (sortBy === 'winRate') {
+          if (sortAscending) {
+            return a.winRate - b.winRate;
+          } else {
+            return b.winRate - a.winRate;
+          }
+        }
+      })
+        .slice(0, isExpanded ? LeaderboardData.length : 6)
+        .map((item, index) => (
+          <View
+            style={[
+              styles.tableRow,
+              index === 3 && !isExpanded
+                ? {opacity: 0.75}
+                : index === 4 && !isExpanded
+                ? {opacity: 0.5}
+                : index === 5 && !isExpanded
+                ? {opacity: 0.25}
+                : {opacity: 1},
+            ]}
+            key={index}>
+            <Text style={[styles.tableCell, styles.narrowColumn]}>
+              {index + 1}
+            </Text>
+            <Text style={styles.tableCell}>{item.player}</Text>
+            <Text style={styles.tableCell}>{item.wins}</Text>
+            <Text style={styles.tableCell}>{item.losses}</Text>
+            <Text style={styles.tableCell}>{item.winRate}%</Text>
+          </View>
+        ))}
       {LeaderboardData.length > 3 && (
-        <TouchableOpacity onPress={() => setIsExpanded(!isExpanded)}>
+        <TouchableOpacity
+          style={styles.showMoreButton}
+          onPress={() => setIsExpanded(!isExpanded)}>
           <Text style={styles.showMoreButtonText}>
             {isExpanded ? '- less' : '+ more'}
           </Text>
         </TouchableOpacity>
       )}
-    </>
+    </View>
   );
 };
 
@@ -219,7 +224,7 @@ export default Leaderboard;
 const styles = StyleSheet.create({
   container: {
     width: '95%',
-    backgroundColor: colours.secondary,
+    backgroundColor: colours.lighter_background,
     borderRadius: 10,
     elevation: 7,
     padding: 10,
@@ -236,7 +241,6 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 28,
     color: colours.text,
-    fontFamily: 'times new roman',
   },
   tableHeaderRow: {
     width: '100%',
@@ -271,10 +275,12 @@ const styles = StyleSheet.create({
     color: colours.text,
     textAlign: 'center',
   },
+  showMoreButton: {
+    borderTopWidth: 1,
+  },
   showMoreButtonText: {
     textAlign: 'center',
-    color: colours.primary,
+    color: colours.accent,
     fontSize: 14,
-    marginBottom: 10,
   },
 });

@@ -9,6 +9,7 @@ import React, {useState} from 'react';
 import colours from './Colours';
 import database from '@react-native-firebase/database';
 import {ToastAndroid} from 'react-native';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
 const AddGame = ({navigation, route}) => {
   const leaderboard = route.params.leaderboard;
@@ -51,15 +52,22 @@ const AddGame = ({navigation, route}) => {
 
   return (
     <View style={styles.container}>
-      <TouchableOpacity
-        style={styles.cancelButtonContainer}
-        onPress={() => navigation.navigate('home', {leaderboard: leaderboard})}>
-        <Text style={styles.cancelButtonText}>Cancel</Text>
-      </TouchableOpacity>
+      <View style={styles.titleContainer}>
+        <TouchableOpacity
+          style={styles.backArrow}
+          onPress={() =>
+            navigation.navigate('home', {leaderboard: leaderboard})
+          }>
+          <MaterialCommunityIcons
+            name={'arrow-left'}
+            size={20}
+            color={colours.text}
+          />
+        </TouchableOpacity>
+        <Text style={styles.title}>Game Details Form</Text>
+      </View>
 
       <View style={styles.formContainer}>
-        <Text style={styles.formTitle}>Game Details Form</Text>
-
         <TextInput
           style={styles.formInput}
           placeholder="Player 1 Name"
@@ -112,25 +120,28 @@ const styles = StyleSheet.create({
     height: '100%',
   },
 
-  cancelButtonContainer: {
-    backgroundColor: colours.secondary,
-    borderRadius: 10,
-    elevation: 7,
-    position: 'absolute',
-    top: 10,
-    left: 10,
+  titleContainer: {
+    display: 'flex',
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 10,
+    position: 'relative',
+    backgroundColor: colours.background,
+    elevation: 5,
   },
-
-  cancelButtonText: {
+  title: {
     fontSize: 20,
     color: colours.text,
-    textAlign: 'center',
-    padding: 15,
-    paddingHorizontal: 30,
+    padding: 10,
+  },
+  backArrow: {
+    position: 'absolute',
+    left: 20,
   },
 
   formContainer: {
-    backgroundColor: colours.secondary,
+    backgroundColor: colours.lighter_background,
     position: 'absolute',
     top: '20%',
     width: '90%',
@@ -140,14 +151,8 @@ const styles = StyleSheet.create({
     padding: 10,
   },
 
-  formTitle: {
-    fontSize: 28,
-    color: colours.text,
-    fontFamily: 'times new roman',
-  },
-
   formInput: {
-    backgroundColor: colours.background,
+    backgroundColor: colours.primary,
     color: colours.text,
     marginVertical: 10,
     padding: 10,
@@ -165,7 +170,7 @@ const styles = StyleSheet.create({
 
   saveButtonText: {
     fontSize: 20,
-    color: colours.background,
+    color: colours.text,
     textAlign: 'center',
     padding: 15,
     paddingHorizontal: 30,

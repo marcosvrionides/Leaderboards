@@ -26,63 +26,74 @@ const GameHistory = ({leaderboardName}) => {
   }, [refresh]);
 
   return (
-    <>
-      <View style={styles.container}>
-        <View style={styles.header}>
-          <Text style={styles.title}>Game History</Text>
-          <TouchableOpacity onPress={() => setRefreshing(!refresh)}>
-            <MaterialCommunityIcons
-              name={'refresh'}
-              size={28}
-              color={colours.text}
-            />
-          </TouchableOpacity>
-        </View>
-        <View style={styles.tableHeaderRow}>
-          <Text style={styles.columnHeader}>Date</Text>
-          <Text style={styles.columnHeader}>Player 1</Text>
-          <Text style={styles.columnHeader}>Score</Text>
-          <Text style={styles.columnHeader}>Player 2</Text>
-        </View>
-        {gameHistoryData
-          .sort((a, b) => {
-            return b.timestamp - a.timestamp;
-          })
-          .slice(0, isExpanded ? gameHistoryData.length : 3)
-          .map((item, index) => {
-            const date = new Date(item.timestamp);
-            const formatedDate =
-              date.getDate() +
-              '/' +
-              (date.getMonth() + 1) +
-              '/' +
-              date.getFullYear();
-            return (
-              <View style={styles.tableRow} key={index}>
-                <Text style={styles.tableCell}>{formatedDate}</Text>
-                <Text style={styles.tableCell}>
-                  {item.player_1_name}
-                  {item.player_1_games_won > item.player_2_games_won && ' 👑'}
-                </Text>
-                <Text style={styles.tableCell}>
-                  {item.player_1_games_won} - {item.player_2_games_won}
-                </Text>
-                <Text style={styles.tableCell}>
-                  {item.player_2_name}
-                  {item.player_1_games_won < item.player_2_games_won && ' 👑'}
-                </Text>
-              </View>
-            );
-          })}
+    <View style={styles.container}>
+      <View style={styles.header}>
+        <Text style={styles.title}>Game History</Text>
+        <TouchableOpacity onPress={() => setRefreshing(!refresh)}>
+          <MaterialCommunityIcons
+            name={'refresh'}
+            size={28}
+            color={colours.text}
+          />
+        </TouchableOpacity>
       </View>
+      <View style={styles.tableHeaderRow}>
+        <Text style={styles.columnHeader}>Date</Text>
+        <Text style={styles.columnHeader}>Player 1</Text>
+        <Text style={styles.columnHeader}>Score</Text>
+        <Text style={styles.columnHeader}>Player 2</Text>
+      </View>
+      {gameHistoryData
+        .sort((a, b) => {
+          return b.timestamp - a.timestamp;
+        })
+        .slice(0, isExpanded ? gameHistoryData.length : 6)
+        .map((item, index) => {
+          const date = new Date(item.timestamp);
+          const formatedDate =
+            date.getDate() +
+            '/' +
+            (date.getMonth() + 1) +
+            '/' +
+            date.getFullYear();
+          return (
+            <View
+              style={[
+                styles.tableRow,
+                index === 3 && !isExpanded
+                  ? {opacity: 0.75}
+                  : index === 4 && !isExpanded
+                  ? {opacity: 0.5}
+                  : index === 5 && !isExpanded
+                  ? {opacity: 0.25}
+                  : {opacity: 1},
+              ]}
+              key={index}>
+              <Text style={styles.tableCell}>{formatedDate}</Text>
+              <Text style={styles.tableCell}>
+                {item.player_1_name}
+                {item.player_1_games_won > item.player_2_games_won && ' 👑'}
+              </Text>
+              <Text style={styles.tableCell}>
+                {item.player_1_games_won} - {item.player_2_games_won}
+              </Text>
+              <Text style={styles.tableCell}>
+                {item.player_2_name}
+                {item.player_1_games_won < item.player_2_games_won && ' 👑'}
+              </Text>
+            </View>
+          );
+        })}
       {gameHistoryData.length > 3 && (
-        <TouchableOpacity onPress={() => setIsExpanded(!isExpanded)}>
+        <TouchableOpacity
+          style={styles.showMoreButton}
+          onPress={() => setIsExpanded(!isExpanded)}>
           <Text style={styles.showMoreButtonText}>
             {isExpanded ? '- less' : '+ more'}
           </Text>
         </TouchableOpacity>
       )}
-    </>
+    </View>
   );
 };
 
@@ -92,7 +103,7 @@ const styles = StyleSheet.create({
   container: {
     height: 'fit-content',
     width: '95%',
-    backgroundColor: colours.secondary,
+    backgroundColor: colours.lighter_background,
     borderRadius: 10,
     elevation: 7,
     padding: 10,
@@ -109,7 +120,6 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 28,
     color: colours.text,
-    fontFamily: 'times new roman',
   },
   tableHeaderRow: {
     width: '100%',
@@ -142,10 +152,12 @@ const styles = StyleSheet.create({
     color: colours.text,
     textAlign: 'center',
   },
+  showMoreButton: {
+    borderTopWidth: 1,
+  },
   showMoreButtonText: {
     textAlign: 'center',
-    color: colours.primary,
+    color: colours.accent,
     fontSize: 14,
-    marginBottom: 10,
   },
 });

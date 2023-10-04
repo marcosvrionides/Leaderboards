@@ -117,7 +117,7 @@ const styles = StyleSheet.create({
   },
   searchBar: {
     width: '100%',
-    backgroundColor: colours.secondary,
+    backgroundColor: colours.primary,
     borderRadius: 10,
     color: colours.text,
     fontSize: 28,
@@ -129,7 +129,7 @@ const styles = StyleSheet.create({
   },
   leaderboardsContainer: {
     width: '100%',
-    backgroundColor: colours.secondary,
+    backgroundColor: colours.lighter_background,
     borderRadius: 10,
     padding: 10,
     elevation: 7,
@@ -138,17 +138,14 @@ const styles = StyleSheet.create({
     gap: 10,
   },
   game: {
-    backgroundColor: colours.background,
     padding: 5,
-    borderRadius: 5,
-    elevation: 7,
   },
   gameText: {
     fontSize: 20,
     color: colours.text,
   },
   newLeaderboardContainer: {
-    backgroundColor: colours.secondary,
+    backgroundColor: colours.accent,
     width: '20%',
     aspectRatio: 1,
     elevation: 7,

@@ -5,6 +5,7 @@ import {
   TouchableOpacity,
   TextInput,
   ToastAndroid,
+  Switch,
 } from 'react-native';
 import React, {useState} from 'react';
 import colours from './Colours';
@@ -15,6 +16,7 @@ const NewLeaderboardForm = ({navigation}) => {
   const [leaderboardName, setLeaderboardName] = useState('');
   const [leaderboardPassword, setLeaderboardPassword] = useState('');
   const [nameInUse, setNameInUse] = useState(false);
+  const [lockLeaderboard, setLockLeaderboard] = useState(true);
 
   const handleChangeLeaderboardName = text => {
     setLeaderboardName(text);
@@ -68,13 +70,23 @@ const NewLeaderboardForm = ({navigation}) => {
           onChangeText={text => handleChangeLeaderboardName(text)}
         />
 
-        <TextInput
-          style={styles.formInput}
-          placeholder="Leaderboard Password"
-          placeholderTextColor={colours.light_text}
-          value={leaderboardPassword}
-          onChangeText={number => setLeaderboardPassword(number)}
-        />
+        <View>
+          {/* <Text>Lock Leaderboard?</Text>
+          <Switch
+            onValueChange={() => setLockLeaderboard(!lockLeaderboard)}
+            value={lockLeaderboard}
+            thumbColor={lockLeaderboard ? colours.primary : 'black'}
+          /> */}
+          {lockLeaderboard && (
+            <TextInput
+              style={styles.formInput}
+              placeholder="Leaderboard Password"
+              placeholderTextColor={colours.light_text}
+              value={leaderboardPassword}
+              onChangeText={number => setLeaderboardPassword(number)}
+            />
+          )}
+        </View>
       </View>
       <TouchableOpacity
         style={styles.saveButtonContainer}

@@ -171,7 +171,7 @@ const styles = StyleSheet.create({
     color: colours.text,
   },
   separator: {
-    width: '90%',
+    width: '95%',
     backgroundColor: colours.accent,
     height: 1,
     alignSelf: 'center',

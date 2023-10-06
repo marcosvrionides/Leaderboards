@@ -4,30 +4,32 @@ import colours from './Colours';
 import database from '@react-native-firebase/database';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
+import {useFocusEffect} from '@react-navigation/native';
 
 const SetsLeaderboard = ({leaderboardName}) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [gameHistoryData, setGameHistoryData] = useState([]);
   const [LeaderboardData, setLeaderboardData] = useState([]);
-  const [refresh, setRefreshing] = useState(false);
   const [sortBy, setSortBy] = useState('wins');
   const [sortAscending, setSortAscending] = useState(false);
 
-  useEffect(() => {
-    setGameHistoryData([]);
-    setIsExpanded(false);
-    const game_history_ref = database().ref('/' + leaderboardName);
-    game_history_ref.once('value', snapshot => {
-      snapshot.forEach(childSnapshot => {
-        if (childSnapshot.key !== 'password') {
-          setGameHistoryData(previousState => [
-            ...previousState,
-            childSnapshot.val(),
-          ]);
-        }
+  useFocusEffect(
+    React.useCallback(() => {
+      setGameHistoryData([]);
+      setIsExpanded(false);
+      const game_history_ref = database().ref('/' + leaderboardName);
+      game_history_ref.once('value', snapshot => {
+        snapshot.forEach(childSnapshot => {
+          if (childSnapshot.key !== 'password') {
+            setGameHistoryData(previousState => [
+              ...previousState,
+              childSnapshot.val(),
+            ]);
+          }
+        });
       });
-    });
-  }, [refresh]);
+    }, []),
+  );
 
   useEffect(() => {
     const leaderboardDataMap = {}; // Create an empty object to store leaderboard data
@@ -106,16 +108,7 @@ const SetsLeaderboard = ({leaderboardName}) => {
 
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.title}>Sets Rankings</Text>
-        <TouchableOpacity onPress={() => setRefreshing(!refresh)}>
-          <MaterialCommunityIcons
-            name={'refresh'}
-            size={28}
-            color={colours.text}
-          />
-        </TouchableOpacity>
-      </View>
+      <Text style={styles.title}>Sets</Text>
       <View style={styles.tableHeaderRow}>
         <Text
           style={[
@@ -255,16 +248,11 @@ const styles = StyleSheet.create({
     margin: 10,
     marginBottom: 20,
   },
-  header: {
-    display: 'flex',
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 10,
-  },
   title: {
     fontSize: 28,
     color: colours.text,
+    marginBottom: 10,
+    textAlign: 'center',
   },
   tableHeaderRow: {
     width: '100%',
@@ -300,7 +288,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   showMoreButton: {
-    borderTopWidth: 1,
+    padding: 10,
   },
   showMoreButtonText: {
     textAlign: 'center',

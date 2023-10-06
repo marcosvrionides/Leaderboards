@@ -76,17 +76,21 @@ const SelectLeaderboard = ({navigation}) => {
             {searchQuery.length > 0 ? 'Search:' : 'Recent:'}
           </Text>
           {filteredLeaderboards.slice(0, 3).map((leaderboard, index) => (
-            <TouchableOpacity
-              key={index}
-              style={styles.game}
-              onPress={() =>
-                navigation.navigate('home', {leaderboard: leaderboard})
-              }>
-              <Text style={styles.gameText}>{leaderboard}</Text>
-            </TouchableOpacity>
+            <View key={index}>
+              <TouchableOpacity
+                style={styles.game}
+                onPress={() =>
+                  navigation.navigate('home', {leaderboard: leaderboard})
+                }>
+                <Text style={styles.gameText}>{leaderboard}</Text>
+              </TouchableOpacity>
+              {index !== filteredLeaderboards.length - 1 && (
+                <View style={styles.separator} />
+              )}
+            </View>
           ))}
         </View>
-        <View style={{borderWidth: 2, marginTop: 30}}>
+        <View style={{marginTop: 30}}>
           <GAMBannerAd
             unitId={'ca-app-pub-7497957931538271/8908530578'}
             sizes={['300x300']}
@@ -165,5 +169,11 @@ const styles = StyleSheet.create({
     fontSize: 18,
     marginTop: 15,
     color: colours.text,
+  },
+  separator: {
+    width: '90%',
+    backgroundColor: colours.accent,
+    height: 1,
+    alignSelf: 'center',
   },
 });

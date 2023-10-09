@@ -22,6 +22,7 @@ const Home = ({navigation, route}) => {
           style={styles.backArrow}
           onPress={() => navigation.navigate('selectLeaderboard')}>
           <MaterialCommunityIcons
+            style={{textAlign: 'center'}}
             name={'arrow-left'}
             size={20}
             color={colours.text}
@@ -70,14 +71,21 @@ const styles = StyleSheet.create({
   },
   backArrow: {
     position: 'absolute',
-    left: 20,
+    left: 10,
+    width: 50,
+    height: '100%',
+    justifyContent: 'center',
   },
   addGameButton: {
     position: 'absolute',
-    right: 20,
+    right: 10,
+    width: 50,
+    height: '100%',
+    justifyContent: 'center',
   },
   addGameButtonText: {
     fontSize: 20,
     color: colours.text,
+    textAlign: 'center',
   },
 });

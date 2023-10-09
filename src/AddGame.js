@@ -116,6 +116,7 @@ const AddGame = ({navigation, route}) => {
               navigation.navigate('home', {leaderboard: leaderboard})
             }>
             <MaterialCommunityIcons
+              style={{textAlign: 'center'}}
               name={'arrow-left'}
               size={20}
               color={colours.text}
@@ -239,7 +240,10 @@ const styles = StyleSheet.create({
   },
   backArrow: {
     position: 'absolute',
-    left: 20,
+    left: 10,
+    width: 50,
+    height: '100%',
+    justifyContent: 'center',
   },
 
   formContainer: {
@@ -282,6 +286,8 @@ const styles = StyleSheet.create({
     backgroundColor: colours.secondary,
     marginBottom: 2,
     borderRadius: 5,
+    borderWidth: 1,
+    borderColor: colours.light_text,
   },
   searchedUserText: {
     textAlign: 'center',

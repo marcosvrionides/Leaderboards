@@ -62,15 +62,17 @@ const GameHistory = ({leaderboardName}) => {
                   : {opacity: 1},
               ]}
               key={index}>
-              <Text style={styles.tableCell}>{formatedDate}</Text>
-              <Text style={styles.tableCell}>
+              <Text style={styles.tableCell} numberOfLines={1}>
+                {formatedDate}
+              </Text>
+              <Text style={styles.tableCell} numberOfLines={1}>
                 {item.player_1_name}
                 {item.player_1_games_won > item.player_2_games_won && ' 👑'}
               </Text>
-              <Text style={styles.tableCell}>
+              <Text style={styles.tableCell} numberOfLines={1}>
                 {item.player_1_games_won} - {item.player_2_games_won}
               </Text>
-              <Text style={styles.tableCell}>
+              <Text style={styles.tableCell} numberOfLines={1}>
                 {item.player_2_name}
                 {item.player_1_games_won < item.player_2_games_won && ' 👑'}
               </Text>

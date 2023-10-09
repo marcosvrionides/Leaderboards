@@ -217,10 +217,18 @@ const SetsLeaderboard = ({leaderboardName}) => {
             <Text style={[styles.tableCell, styles.narrowColumn]}>
               {index + 1}
             </Text>
-            <Text style={styles.tableCell}>{item.player}</Text>
-            <Text style={styles.tableCell}>{item.wins}</Text>
-            <Text style={styles.tableCell}>{item.losses}</Text>
-            <Text style={styles.tableCell}>{item.winRate}%</Text>
+            <Text style={styles.tableCell} numberOfLines={1}>
+              {item.player}
+            </Text>
+            <Text style={styles.tableCell} numberOfLines={1}>
+              {item.wins}
+            </Text>
+            <Text style={styles.tableCell} numberOfLines={1}>
+              {item.losses}
+            </Text>
+            <Text style={styles.tableCell} numberOfLines={1}>
+              {item.winRate}%
+            </Text>
           </View>
         ))}
       {LeaderboardData.length > 3 && (

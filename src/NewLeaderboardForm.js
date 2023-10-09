@@ -16,7 +16,7 @@ const NewLeaderboardForm = ({navigation}) => {
   const [leaderboardName, setLeaderboardName] = useState('');
   const [leaderboardPassword, setLeaderboardPassword] = useState('');
   const [nameInUse, setNameInUse] = useState(false);
-  const [lockLeaderboard, setLockLeaderboard] = useState(true);
+  const [lockLeaderboard, setLockLeaderboard] = useState(false);
 
   const handleChangeLeaderboardName = text => {
     setLeaderboardName(text);
@@ -35,7 +35,7 @@ const NewLeaderboardForm = ({navigation}) => {
       ToastAndroid.show('This name is already in use.', ToastAndroid.SHORT);
       return;
     }
-    if (leaderboardPassword.trim() === '') {
+    if (lockLeaderboard && leaderboardPassword.trim() === '') {
       ToastAndroid.show('Please enter a password', ToastAndroid.SHORT);
       return;
     }
@@ -70,23 +70,23 @@ const NewLeaderboardForm = ({navigation}) => {
           onChangeText={text => handleChangeLeaderboardName(text)}
         />
 
-        <View>
-          {/* <Text>Lock Leaderboard?</Text>
+        <View style={styles.lockLeaderboardContainer}>
+          <Text style={styles.lockLeaderboardText}>Require Password?</Text>
           <Switch
             onValueChange={() => setLockLeaderboard(!lockLeaderboard)}
             value={lockLeaderboard}
             thumbColor={lockLeaderboard ? colours.primary : 'black'}
-          /> */}
-          {lockLeaderboard && (
-            <TextInput
-              style={styles.formInput}
-              placeholder="Leaderboard Password"
-              placeholderTextColor={colours.light_text}
-              value={leaderboardPassword}
-              onChangeText={number => setLeaderboardPassword(number)}
-            />
-          )}
+          />
         </View>
+        {lockLeaderboard && (
+          <TextInput
+            style={styles.formInput}
+            placeholder="Leaderboard Password"
+            placeholderTextColor={colours.light_text}
+            value={leaderboardPassword}
+            onChangeText={number => setLeaderboardPassword(number)}
+          />
+        )}
       </View>
       <TouchableOpacity
         style={styles.saveButtonContainer}
@@ -157,6 +157,15 @@ const styles = StyleSheet.create({
   },
   errorBorder: {
     borderWidth: 2,
-    borderColor: 'red', // Red border for error state
+    borderColor: 'red',
+  },
+  lockLeaderboardContainer: {
+    display: 'flex',
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  lockLeaderboardText: {
+    color: colours.text,
   },
 });

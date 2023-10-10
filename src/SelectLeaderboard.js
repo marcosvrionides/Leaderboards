@@ -28,7 +28,7 @@ const SelectLeaderboard = ({navigation}) => {
 
   useFocusEffect(
     React.useCallback(() => {
-      // setShowPasswordInput(false);
+      setShowPasswordInput(false);
       const leaderboardsRef = database().ref('/');
       leaderboardsRef.once('value', snapshot => {
         const leaderboardArray = [];
@@ -62,6 +62,7 @@ const SelectLeaderboard = ({navigation}) => {
         if (childSnapshot.val() !== '') {
           console.log('locked');
           setShowPasswordInput(true);
+          setPasswordInput('');
           setSelectedLeaderboard({
             leaderboard: leaderboard,
             password: childSnapshot.val(),
@@ -90,16 +91,34 @@ const SelectLeaderboard = ({navigation}) => {
       }}>
       <View style={styles.container}>
         {showPasswordInput && (
-          <View style={styles.passwordInputContainer}>
-            <View style={styles.passwordInputWrapper}>
+          <View style={styles.passwordFormContainer}>
+            <TouchableOpacity
+              onPress={() => {
+                setShowPasswordInput(false);
+                setPasswordInput('');
+              }}
+              style={styles.closePasswordFormContainer}>
+              <View
+                style={[styles.closeLine, {transform: [{rotate: '45deg'}]}]}
+              />
+              <View
+                style={[styles.closeLine, {transform: [{rotate: '-45deg'}]}]}
+              />
+            </TouchableOpacity>
+            <View style={styles.passwordInputContainer}>
               <Text style={{color: colours.text, fontSize: 20}}>
-                Enter password for {selecedLeaderboard.leaderboard}
+                Enter password for{' '}
+                <Text style={styles.leaderboardName}>
+                  {selecedLeaderboard.leaderboard}
+                </Text>
               </Text>
               <View style={styles.inputContainer}>
                 <TextInput
+                  style={styles.passwordInput}
+                  placeholder="password"
+                  placeholderTextColor={colours.light_text}
                   onChangeText={text => setPasswordInput(text)}
                   value={passwordInput}
-                  style={styles.passwordInput}
                 />
                 <TouchableOpacity
                   onPress={() => handleCheckPassword()}
@@ -113,11 +132,6 @@ const SelectLeaderboard = ({navigation}) => {
                 </TouchableOpacity>
               </View>
             </View>
-            <TouchableOpacity
-              onPress={() => setShowPasswordInput(false)}
-              style={styles.closePasswordInputContainer}>
-              <Text style={styles.closePasswordInputContainerText}>Close</Text>
-            </TouchableOpacity>
           </View>
         )}
         <View style={styles.leaderboardsContainer}>
@@ -241,21 +255,20 @@ const styles = StyleSheet.create({
     height: 1,
     alignSelf: 'center',
   },
-  passwordInputContainer: {
+  passwordFormContainer: {
+    backgroundColor: colours.background,
     zIndex: 1,
     position: 'absolute',
     bottom: 10,
     width: '100%',
     height: '100%',
-    backgroundColor: colours.background,
     borderWidth: 2,
-    display: 'flex',
-    justifyContent: 'space-between',
-    gap: 10,
     paddingVertical: 10,
-    alignItems: 'center',
+    borderRadius: 10,
   },
-  passwordInputWrapper: {
+  passwordInputContainer: {
+    position: 'absolute',
+    top: '30%',
     width: '100%',
     alignItems: 'center',
     display: 'flex',
@@ -263,18 +276,8 @@ const styles = StyleSheet.create({
   },
   passwordInput: {
     flex: 0.95,
-  },
-  closePasswordInputContainer: {
-    borderWidth: 2,
-    width: 75,
-    height: 75,
-    borderRadius: 50,
-    justifyContent: 'center',
-  },
-  closePasswordInputContainerText: {
-    textAlign: 'center',
     color: colours.text,
-    fontSize: 20,
+    fontSize: 15,
   },
   inputContainer: {
     flexDirection: 'row',
@@ -286,12 +289,32 @@ const styles = StyleSheet.create({
   enterPasswordButtonContainer: {
     backgroundColor: colours.primary,
     justifyContent: 'center',
-    margin: 10,
+    marginRight: 5,
     height: 40,
     width: 40,
-    borderRadius: 10,
+    borderRadius: 50,
+    elevation: 7,
   },
   enterPasswordButtonText: {
     textAlign: 'center',
+  },
+  leaderboardName: {
+    fontStyle: 'italic',
+    fontWeight: 'bold',
+    color: colours.accent,
+  },
+  closePasswordFormContainer: {
+    width: 50,
+    height: 50,
+    justifyContent: 'center',
+    position: 'absolute',
+    bottom: 50,
+    left: '50%',
+    transform: [{translateX: -25}],
+  },
+  closeLine: {
+    height: 2,
+    width: '100%',
+    backgroundColor: colours.text,
   },
 });

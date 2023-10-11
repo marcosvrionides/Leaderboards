@@ -7,6 +7,7 @@ import {
   TouchableWithoutFeedback,
   View,
   ToastAndroid,
+  Modal,
 } from 'react-native';
 import React, {useRef, useState, useEffect} from 'react';
 import {useFocusEffect} from '@react-navigation/native';
@@ -14,6 +15,8 @@ import colours from './Colours';
 import database from '@react-native-firebase/database';
 import {GAMBannerAd} from 'react-native-google-mobile-ads';
 import AntDesign from 'react-native-vector-icons/AntDesign';
+import SQLiteStorage from 'react-native-sqlite-storage';
+import SetsLeaderboard from './SetsLeaderboard';
 
 const SelectLeaderboard = ({navigation}) => {
   const [leaderboards, setLeaderboards] = useState([]);
@@ -21,10 +24,61 @@ const SelectLeaderboard = ({navigation}) => {
   const [filteredLeaderboards, setFilteredLeaderboards] = useState([]);
 
   const [showPasswordInput, setShowPasswordInput] = useState(false);
-  const [selecedLeaderboard, setSelectedLeaderboard] = useState({});
+  const [selectedLeaderboard, setSelectedLeaderboard] = useState({});
   const [passwordInput, setPasswordInput] = useState('');
 
+  const [pinnedLeaderboards, setPinnedLeaderboards] = useState([]);
+  const [refresh, setRefresh] = useState(false);
+
   const searchInputRef = useRef(null);
+
+  // Open or create the database
+  const db = SQLiteStorage.openDatabase(
+    {
+      name: 'myDatabase.db',
+      location: 'default',
+    },
+    () => {
+      return;
+    },
+    error => {
+      console.error('Error opening database:', error);
+    },
+  );
+
+  useEffect(() => {
+    // Read data from the database
+    db.transaction(tx => {
+      setPinnedLeaderboards([]);
+      tx.executeSql(
+        'SELECT * FROM pinned_leaderboards',
+        [],
+        (tx, results) => {
+          // The results variable contains the query result
+          const len = results.rows.length;
+          if (len > 0) {
+            // Loop through the results
+            for (let i = 0; i < len; i++) {
+              const row = results.rows.item(i);
+              // Access the data in each row
+              const leaderboard_name = row.leaderboard_name;
+
+              // Do something with the retrieved data
+              setPinnedLeaderboards(prevState => [
+                ...prevState,
+                leaderboard_name,
+              ]);
+            }
+          } else {
+            console.log('No data found in the table.');
+          }
+        },
+        error => {
+          console.error('Error reading data from the table:', error);
+        },
+      );
+    });
+  }, [refresh]);
 
   useFocusEffect(
     React.useCallback(() => {
@@ -35,11 +89,14 @@ const SelectLeaderboard = ({navigation}) => {
         snapshot.forEach(childSnapshot => {
           leaderboardArray.push(childSnapshot.key);
         });
+
         setLeaderboards(leaderboardArray);
         setFilteredLeaderboards(leaderboardArray);
       });
     }, []),
   );
+
+  console.log(leaderboards);
 
   const handleSearch = text => {
     setSearchQuery(text);
@@ -75,13 +132,68 @@ const SelectLeaderboard = ({navigation}) => {
   };
 
   const handleCheckPassword = () => {
-    if (passwordInput === selecedLeaderboard.password) {
+    if (passwordInput === selectedLeaderboard.password) {
       navigation.navigate('home', {
-        leaderboard: selecedLeaderboard.leaderboard,
+        leaderboard: selectedLeaderboard.leaderboard,
       });
     } else {
       ToastAndroid.show('Wrong password.', ToastAndroid.SHORT);
     }
+  };
+
+  const [showPinPopup, setShowPinPopup] = useState(false);
+  const handleLongPress = leaderboard => {
+    setShowPinPopup(!showPinPopup);
+    setSelectedLeaderboard(leaderboard);
+  };
+
+  const handlePinLeaderboard = () => {
+    // Create a table
+    db.transaction(tx => {
+      tx.executeSql(
+        'CREATE TABLE IF NOT EXISTS pinned_leaderboards (id INTEGER PRIMARY KEY AUTOINCREMENT, leaderboard_name TEXT)',
+        [],
+        () => {
+          console.log('Table created successfully');
+        },
+        error => {
+          console.error('Error creating table:', error);
+        },
+      );
+    });
+
+    if (pinnedLeaderboards.includes(selectedLeaderboard)) {
+      // Remove leaderboards from the table
+      db.transaction(tx => {
+        tx.executeSql(
+          'DELETE FROM pinned_leaderboards WHERE leaderboard_name = ?',
+          [selectedLeaderboard],
+          () => {
+            console.log('Leaderboard removed successfully');
+          },
+          error => {
+            console.error('Error removing leaderboard:', error);
+          },
+        );
+      });
+    } else {
+      // Insert data into the table
+      db.transaction(tx => {
+        tx.executeSql(
+          'INSERT INTO pinned_leaderboards (leaderboard_name) VALUES (?)',
+          [selectedLeaderboard],
+          () => {
+            ToastAndroid.show('Added to favourites.', ToastAndroid.SHORT);
+          },
+          error => {
+            console.error('Error inserting data:', error);
+          },
+        );
+      });
+    }
+    setSelectedLeaderboard('');
+    setShowPinPopup(false);
+    setRefresh(!refresh);
   };
 
   return (
@@ -90,6 +202,25 @@ const SelectLeaderboard = ({navigation}) => {
         Keyboard.dismiss();
       }}>
       <View style={styles.container}>
+        <Modal
+          animationType="slide"
+          transparent={true}
+          visible={showPinPopup}
+          onRequestClose={() => setShowPinPopup(!showPinPopup)}>
+          <View style={styles.pinPopup}>
+            <Text>
+              {pinnedLeaderboards.includes(selectedLeaderboard)
+                ? 'Remove from favourites?'
+                : 'Add to favourites?'}
+            </Text>
+            <TouchableOpacity onPress={() => handlePinLeaderboard()}>
+              <Text>Yes</Text>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={() => setShowPinPopup(false)}>
+              <Text>Cancel</Text>
+            </TouchableOpacity>
+          </View>
+        </Modal>
         {showPasswordInput && (
           <View style={styles.passwordFormContainer}>
             <TouchableOpacity
@@ -109,7 +240,7 @@ const SelectLeaderboard = ({navigation}) => {
               <Text style={{color: colours.text, fontSize: 20}}>
                 Enter password for{' '}
                 <Text style={styles.leaderboardName}>
-                  {selecedLeaderboard.leaderboard}
+                  {selectedLeaderboard.leaderboard}
                 </Text>
               </Text>
               <View style={styles.inputContainer}>
@@ -153,14 +284,42 @@ const SelectLeaderboard = ({navigation}) => {
               />
             </View>
           </TouchableWithoutFeedback>
+          {searchQuery.length === 0 && (
+            <Text style={styles.recentText}>Favourites:</Text>
+          )}
+          {searchQuery.length === 0 &&
+            pinnedLeaderboards.map((leaderboard, index) => (
+              <View key={index}>
+                <TouchableOpacity
+                  style={styles.game}
+                  onPress={() => handleOpenLeaderboard(leaderboard)}
+                  onLongPress={() => handleLongPress(leaderboard)}>
+                  <Text style={styles.gameText}>{leaderboard}</Text>
+                </TouchableOpacity>
+                {index !== pinnedLeaderboards.length - 1 && (
+                  <View style={styles.separator} />
+                )}
+              </View>
+            ))}
+          {searchQuery.length === 0 && (
+            <View
+              style={{
+                width: '100%',
+                height: 3,
+                backgroundColor: colours.accent,
+                marginTop: 10,
+              }}
+            />
+          )}
           <Text style={styles.recentText}>
             {searchQuery.length > 0 ? 'Search:' : 'Recent:'}
           </Text>
-          {filteredLeaderboards.slice(0, 3).map((leaderboard, index) => (
+          {filteredLeaderboards.slice(0, 5).map((leaderboard, index) => (
             <View key={index}>
               <TouchableOpacity
                 style={styles.game}
-                onPress={() => handleOpenLeaderboard(leaderboard)}>
+                onPress={() => handleOpenLeaderboard(leaderboard)}
+                onLongPress={() => handleLongPress(leaderboard)}>
                 <Text style={styles.gameText}>{leaderboard}</Text>
               </TouchableOpacity>
               {index !== filteredLeaderboards.length - 1 && (
@@ -168,13 +327,6 @@ const SelectLeaderboard = ({navigation}) => {
               )}
             </View>
           ))}
-        </View>
-        <View style={{marginTop: 30}}>
-          <GAMBannerAd
-            unitId={'ca-app-pub-7497957931538271/8908530578'}
-            sizes={['300x300']}
-            onAdFailedToLoad={onAdFailedToLoad}
-          />
         </View>
         <TouchableOpacity
           onPress={() => navigation.navigate('addLeaderboard')}
@@ -254,6 +406,7 @@ const styles = StyleSheet.create({
     backgroundColor: colours.accent,
     height: 1,
     alignSelf: 'center',
+    marginTop: 10,
   },
   passwordFormContainer: {
     backgroundColor: colours.background,
@@ -316,5 +469,19 @@ const styles = StyleSheet.create({
     height: 2,
     width: '100%',
     backgroundColor: colours.text,
+  },
+  pinPopup: {
+    backgroundColor: colours.background,
+    borderWidth: 2,
+    borderColor: colours.text,
+    borderRadius: 25,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 25,
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    transform: [{translateX: -80}, {translateY: -60}],
+    elevation: 7,
   },
 });

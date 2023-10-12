@@ -90,10 +90,23 @@ const SelectLeaderboard = ({navigation}) => {
           leaderboardArray.push(childSnapshot.key);
         });
 
-        setLeaderboards(leaderboardArray);
-        setFilteredLeaderboards(leaderboardArray);
+        // Sort leaderboards
+        const sortedLeaderboards = leaderboardArray.sort((a, b) => {
+          const aIsPinned = pinnedLeaderboards.includes(a);
+          const bIsPinned = pinnedLeaderboards.includes(b);
+          if (aIsPinned && !bIsPinned) {
+            return -1;
+          }
+          if (!aIsPinned && bIsPinned) {
+            return 1;
+          }
+          return 0;
+        });
+
+        setLeaderboards(sortedLeaderboards);
+        setFilteredLeaderboards(sortedLeaderboards);
       });
-    }, []),
+    }, [pinnedLeaderboards]),
   );
 
   console.log(leaderboards);
@@ -104,10 +117,6 @@ const SelectLeaderboard = ({navigation}) => {
       leaderboard.toLowerCase().includes(text.toLowerCase()),
     );
     setFilteredLeaderboards(filtered);
-  };
-
-  const onAdFailedToLoad = error => {
-    console.log('error loading ad', error.message);
   };
 
   const handleOpenLeaderboard = leaderboard => {
@@ -208,17 +217,23 @@ const SelectLeaderboard = ({navigation}) => {
           visible={showPinPopup}
           onRequestClose={() => setShowPinPopup(!showPinPopup)}>
           <View style={styles.pinPopup}>
-            <Text>
+            <Text style={styles.pinPopupText}>
               {pinnedLeaderboards.includes(selectedLeaderboard)
-                ? 'Remove from favourites?'
-                : 'Add to favourites?'}
+                ? 'Remove pin?'
+                : 'Pin ' + selectedLeaderboard + '?'}
             </Text>
-            <TouchableOpacity onPress={() => handlePinLeaderboard()}>
-              <Text>Yes</Text>
-            </TouchableOpacity>
-            <TouchableOpacity onPress={() => setShowPinPopup(false)}>
-              <Text>Cancel</Text>
-            </TouchableOpacity>
+            <View style={styles.pinButtonsContainer}>
+              <TouchableOpacity
+                style={styles.pinButtons}
+                onPress={() => handlePinLeaderboard()}>
+                <Text style={styles.pinButtonsText}>Yes</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.pinButtons}
+                onPress={() => setShowPinPopup(false)}>
+                <Text style={styles.pinButtonsText}>Cancel</Text>
+              </TouchableOpacity>
+            </View>
           </View>
         </Modal>
         {showPasswordInput && (
@@ -284,33 +299,6 @@ const SelectLeaderboard = ({navigation}) => {
               />
             </View>
           </TouchableWithoutFeedback>
-          {searchQuery.length === 0 && (
-            <Text style={styles.recentText}>Favourites:</Text>
-          )}
-          {searchQuery.length === 0 &&
-            pinnedLeaderboards.map((leaderboard, index) => (
-              <View key={index}>
-                <TouchableOpacity
-                  style={styles.game}
-                  onPress={() => handleOpenLeaderboard(leaderboard)}
-                  onLongPress={() => handleLongPress(leaderboard)}>
-                  <Text style={styles.gameText}>{leaderboard}</Text>
-                </TouchableOpacity>
-                {index !== pinnedLeaderboards.length - 1 && (
-                  <View style={styles.separator} />
-                )}
-              </View>
-            ))}
-          {searchQuery.length === 0 && (
-            <View
-              style={{
-                width: '100%',
-                height: 3,
-                backgroundColor: colours.accent,
-                marginTop: 10,
-              }}
-            />
-          )}
           <Text style={styles.recentText}>
             {searchQuery.length > 0 ? 'Search:' : 'Recent:'}
           </Text>
@@ -320,7 +308,10 @@ const SelectLeaderboard = ({navigation}) => {
                 style={styles.game}
                 onPress={() => handleOpenLeaderboard(leaderboard)}
                 onLongPress={() => handleLongPress(leaderboard)}>
-                <Text style={styles.gameText}>{leaderboard}</Text>
+                <Text style={styles.gameText}>
+                  {leaderboard}
+                  {pinnedLeaderboards.includes(leaderboard) ? ' 📌' : ''}
+                </Text>
               </TouchableOpacity>
               {index !== filteredLeaderboards.length - 1 && (
                 <View style={styles.separator} />
@@ -471,17 +462,38 @@ const styles = StyleSheet.create({
     backgroundColor: colours.text,
   },
   pinPopup: {
-    backgroundColor: colours.background,
+    backgroundColor: colours.lighter_background,
     borderWidth: 2,
-    borderColor: colours.text,
-    borderRadius: 25,
+    borderColor: colours.accent,
+    borderRadius: 10,
     justifyContent: 'center',
     alignItems: 'center',
     padding: 25,
     position: 'absolute',
     top: '50%',
     left: '50%',
-    transform: [{translateX: -80}, {translateY: -60}],
+    transform: [{translateX: -165}, {translateY: -50}],
     elevation: 7,
+  },
+  pinPopupText: {
+    color: colours.text,
+    fontSize: 20,
+    fontWeight: 'bold',
+  },
+  pinButtonsContainer: {
+    flexDirection: 'row',
+    gap: 10,
+    marginTop: 10,
+  },
+  pinButtons: {
+    backgroundColor: colours.accent,
+    padding: 10,
+    borderRadius: 5,
+    width: '40%', // adjust as needed
+    alignItems: 'center',
+  },
+  pinButtonsText: {
+    color: colours.text,
+    fontSize: 18, // adjust as needed
   },
 });

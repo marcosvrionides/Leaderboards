@@ -10,7 +10,7 @@ const Leaderboard = ({leaderboardName}) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [gameHistoryData, setGameHistoryData] = useState([]);
   const [LeaderboardData, setLeaderboardData] = useState([]);
-  const [sortBy, setSortBy] = useState('wins');
+  const [sortBy, setSortBy] = useState('winRate');
   const [sortAscending, setSortAscending] = useState(false);
 
   useFocusEffect(

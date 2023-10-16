@@ -38,9 +38,9 @@ const Home = ({navigation, route}) => {
         </TouchableOpacity>
       </View>
       <ScrollView style={styles.scrollView}>
-        <GameHistory leaderboardName={leaderboard} />
         <SetsLeaderboard leaderboardName={leaderboard} />
         <Leaderboard leaderboardName={leaderboard} />
+        <GameHistory leaderboardName={leaderboard} />
       </ScrollView>
     </View>
   );

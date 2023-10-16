@@ -109,8 +109,6 @@ const SelectLeaderboard = ({navigation}) => {
     }, [pinnedLeaderboards]),
   );
 
-  console.log(leaderboards);
-
   const handleSearch = text => {
     setSearchQuery(text);
     const filtered = leaderboards.filter(leaderboard =>
@@ -299,9 +297,6 @@ const SelectLeaderboard = ({navigation}) => {
               />
             </View>
           </TouchableWithoutFeedback>
-          <Text style={styles.recentText}>
-            {searchQuery.length > 0 ? 'Search:' : 'Recent:'}
-          </Text>
           {filteredLeaderboards.slice(0, 5).map((leaderboard, index) => (
             <View key={index}>
               <TouchableOpacity
@@ -319,6 +314,9 @@ const SelectLeaderboard = ({navigation}) => {
             </View>
           ))}
         </View>
+        <Text style={colours.light_text}>
+          (Long press to pin a leaderboard)
+        </Text>
         <TouchableOpacity
           onPress={() => navigation.navigate('addLeaderboard')}
           style={styles.newLeaderboardContainer}>
@@ -386,11 +384,6 @@ const styles = StyleSheet.create({
     color: colours.text,
     padding: 10,
     textAlign: 'center',
-  },
-  recentText: {
-    fontSize: 18,
-    marginTop: 15,
-    color: colours.text,
   },
   separator: {
     width: '95%',
@@ -468,11 +461,12 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 25,
+    paddingVertical: 25,
+    width: '90%',
+    marginHorizontal: 20,
     position: 'absolute',
     top: '50%',
-    left: '50%',
-    transform: [{translateX: -165}, {translateY: -50}],
+    transform: [{translateY: -50}],
     elevation: 7,
   },
   pinPopupText: {
@@ -489,11 +483,11 @@ const styles = StyleSheet.create({
     backgroundColor: colours.accent,
     padding: 10,
     borderRadius: 5,
-    width: '40%', // adjust as needed
+    width: '40%',
     alignItems: 'center',
   },
   pinButtonsText: {
     color: colours.text,
-    fontSize: 18, // adjust as needed
+    fontSize: 18,
   },
 });

@@ -12,6 +12,8 @@ import colours from './Colours';
 import database from '@react-native-firebase/database';
 import {ToastAndroid, FlatList} from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import * as MediaPicker from 'react-native-image-picker';
+import storage from '@react-native-firebase/storage';
 
 const AddGame = ({navigation, route}) => {
   const leaderboard = route.params.leaderboard;
@@ -20,6 +22,8 @@ const AddGame = ({navigation, route}) => {
   const [player2Name, setPlayer2Name] = useState('');
   const [player1GamesWon, setPlayer1GamesWon] = useState('');
   const [player2GamesWon, setPlayer2GamesWon] = useState('');
+  const [gameNote, setGameNote] = useState();
+  const [gameMedia, setGameMedia] = useState();
   const [playerNames, setPlayerNames] = useState([]);
   const [filteredPlayer1Names, setFilteredPlayer1Names] = useState([]);
   const [filteredPlayer2Names, setFilteredPlayer2Names] = useState([]);
@@ -92,15 +96,40 @@ const AddGame = ({navigation, route}) => {
       return;
     }
     const game_history_ref = database().ref('/' + leaderboard);
-    game_history_ref.push({
+    const newGameRef = game_history_ref.push({
       player_1_name: player1Name,
       player_2_name: player2Name,
       player_1_games_won: player1GamesWon,
       player_2_games_won: player2GamesWon,
+      note: gameNote,
+      media: gameMedia,
       timestamp: database.ServerValue.TIMESTAMP,
     });
+
+    if (gameMedia !== undefined) {
+      uploadMedia(newGameRef.key);
+    }
+
     ToastAndroid.show('Game Saved.', ToastAndroid.SHORT);
     navigation.navigate('home', {leaderboard: leaderboard});
+  };
+
+  const uploadMedia = async key => {
+    const reference = storage().ref('/game_media/' + key);
+    await reference.putFile(gameMedia);
+  };
+
+  const handleOpenMediaPicker = async () => {
+    MediaPicker.launchCamera(
+      {
+        mediaType: 'mixed',
+      },
+      response => {
+        if (!response.didCancel && !response.error && !response.customButton) {
+          setGameMedia(response.assets[0].uri);
+        }
+      },
+    );
   };
 
   return (
@@ -123,6 +152,16 @@ const AddGame = ({navigation, route}) => {
             />
           </TouchableOpacity>
           <Text style={styles.title}>Game Details Form</Text>
+          {player1Name !== '' &&
+            player2Name !== '' &&
+            player1GamesWon !== '' &&
+            player2GamesWon !== '' && (
+              <TouchableOpacity
+                style={styles.saveButtonContainer}
+                onPress={() => saveGame()}>
+                <Text style={styles.saveButtonText}>Save</Text>
+              </TouchableOpacity>
+            )}
         </View>
 
         <View style={styles.formContainer}>
@@ -203,13 +242,22 @@ const AddGame = ({navigation, route}) => {
             onChangeText={number => setPlayer2GamesWon(number)}
             keyboardType="numeric"
           />
-        </View>
 
-        <TouchableOpacity
-          style={styles.saveButtonContainer}
-          onPress={() => saveGame()}>
-          <Text style={styles.saveButtonText}>Save</Text>
-        </TouchableOpacity>
+          <View style={styles.addExtraContainer}>
+            <TextInput
+              style={styles.noteInput}
+              placeholder="Add a note"
+              placeholderTextColor={colours.light_text}
+              value={gameNote}
+              onChangeText={string => setGameNote(string)}
+            />
+            <TouchableOpacity
+              style={styles.mediaInput}
+              onPress={() => handleOpenMediaPicker()}>
+              <Text>📷</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
       </View>
     </TouchableWithoutFeedback>
   );
@@ -222,11 +270,10 @@ const styles = StyleSheet.create({
     backgroundColor: colours.background,
     height: '100%',
   },
-
   titleContainer: {
     display: 'flex',
     flexDirection: 'row',
-    justifyContent: 'center',
+    justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: 10,
     position: 'relative',
@@ -239,24 +286,27 @@ const styles = StyleSheet.create({
     padding: 10,
   },
   backArrow: {
-    position: 'absolute',
-    left: 10,
-    width: 50,
-    height: '100%',
     justifyContent: 'center',
   },
-
+  saveButtonContainer: {
+    backgroundColor: colours.primary,
+    borderRadius: 10,
+  },
+  saveButtonText: {
+    fontSize: 20,
+    color: colours.text,
+    textAlign: 'center',
+    padding: 5,
+    paddingHorizontal: 30,
+  },
   formContainer: {
     backgroundColor: colours.lighter_background,
-    position: 'absolute',
-    top: '20%',
     width: '90%',
     margin: 20,
     borderRadius: 10,
     elevation: 7,
     padding: 10,
   },
-
   formInput: {
     backgroundColor: colours.primary,
     color: colours.text,
@@ -264,24 +314,6 @@ const styles = StyleSheet.create({
     padding: 10,
     borderRadius: 5,
   },
-
-  saveButtonContainer: {
-    backgroundColor: colours.primary,
-    borderRadius: 10,
-    elevation: 7,
-    position: 'absolute',
-    bottom: 10,
-    right: 10,
-  },
-
-  saveButtonText: {
-    fontSize: 20,
-    color: colours.text,
-    textAlign: 'center',
-    padding: 15,
-    paddingHorizontal: 30,
-  },
-  searchedUsersList: {},
   searchedUserContainer: {
     backgroundColor: colours.secondary,
     marginBottom: 2,
@@ -293,5 +325,26 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     color: colours.light_text,
     padding: 10,
+  },
+  addExtraContainer: {
+    display: 'flex',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    gap: 10,
+    alignItems: 'center',
+  },
+  noteInput: {
+    color: colours.text,
+    backgroundColor: colours.primary,
+    borderRadius: 5,
+    width: '75%',
+  },
+  mediaInput: {
+    padding: 10,
+    backgroundColor: colours.primary,
+    borderRadius: 5,
+    flex: 1,
+    borderWidth: 2,
+    borderColor: colours.text,
   },
 });

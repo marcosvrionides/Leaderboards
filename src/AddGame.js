@@ -6,6 +6,8 @@ import {
   Keyboard,
   View,
   TextInput,
+  Image,
+  ScrollView,
 } from 'react-native';
 import React, {useState, useEffect} from 'react';
 import colours from './Colours';
@@ -137,7 +139,7 @@ const AddGame = ({navigation, route}) => {
       onPress={() => {
         Keyboard.dismiss();
       }}>
-      <View style={styles.container}>
+      <ScrollView style={styles.container}>
         <View style={styles.titleContainer}>
           <TouchableOpacity
             style={styles.backArrow}
@@ -254,11 +256,21 @@ const AddGame = ({navigation, route}) => {
             <TouchableOpacity
               style={styles.mediaInput}
               onPress={() => handleOpenMediaPicker()}>
-              <Text>📷</Text>
+              <Text>Pic? 📷</Text>
             </TouchableOpacity>
           </View>
+          {gameMedia !== undefined && (
+            <View>
+              <TouchableOpacity
+                onPress={() => setGameMedia()}
+                style={styles.removeMediaButton}>
+                <Text style={styles.removeMediaButtonText}>X</Text>
+              </TouchableOpacity>
+              <Image style={styles.mediaPreview} src={gameMedia} />
+            </View>
+          )}
         </View>
-      </View>
+      </ScrollView>
     </TouchableWithoutFeedback>
   );
 };
@@ -346,5 +358,27 @@ const styles = StyleSheet.create({
     flex: 1,
     borderWidth: 2,
     borderColor: colours.text,
+  },
+  mediaPreview: {
+    width: '100%',
+    aspectRatio: 1,
+    borderWidth: 2,
+    borderRadius: 10,
+    borderColor: colours.text,
+    marginTop: 10,
+  },
+  removeMediaButton: {
+    position: 'absolute',
+    top: 20,
+    left: 10,
+    zIndex: 1,
+    padding: 10,
+    borderRadius: 50,
+    borderWidth: 2,
+    borderColor: colours.text,
+  },
+  removeMediaButtonText: {
+    color: colours.text,
+    fontSize: 20,
   },
 });

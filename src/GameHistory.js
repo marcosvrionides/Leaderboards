@@ -1,4 +1,4 @@
-import {StyleSheet, Text, TouchableOpacity, View, Modal} from 'react-native';
+import {StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import React, {useState} from 'react';
 import colours from './Colours';
 import database from '@react-native-firebase/database';
@@ -6,21 +6,19 @@ import {useFocusEffect} from '@react-navigation/native';
 import GameCard from './GameCard';
 
 const GameHistory = ({leaderboardName}) => {
-  const [isExpanded, setIsExpanded] = useState(false);
   const [gameHistoryData, setGameHistoryData] = useState([]);
   const [renderedData, setRenderedData] = useState(5);
 
   useFocusEffect(
     React.useCallback(() => {
       setGameHistoryData([]);
-      setIsExpanded(false);
       const game_history_ref = database().ref('/' + leaderboardName);
       game_history_ref.once('value', snapshot => {
         const data = [];
         snapshot.forEach(childSnapshot => {
           if (childSnapshot.key !== 'password') {
-            const gameData = childSnapshot.val(); // Get the value object
-            gameData.key = childSnapshot.key; // Add the key as an attribute
+            const gameData = childSnapshot.val();
+            gameData.key = childSnapshot.key;
             data.push(gameData);
           }
         });
@@ -30,12 +28,12 @@ const GameHistory = ({leaderboardName}) => {
   );
 
   const handleLoadMore = () => {
-    if (renderedData < gameHistoryData.length + 5) {
+    if (gameHistoryData.length - renderedData > 5) {
       setRenderedData(prevState => prevState + 5);
-    } else if (renderedData >= gameHistoryData.length) {
-      setRenderedData(5);
-    } else {
+    } else if (renderedData < gameHistoryData.length) {
       setRenderedData(gameHistoryData.length);
+    } else {
+      setRenderedData(5);
     }
   };
 
@@ -55,7 +53,7 @@ const GameHistory = ({leaderboardName}) => {
           style={styles.showMoreButton}
           onPress={() => handleLoadMore()}>
           <Text style={styles.showMoreButtonText}>
-            {renderedData >= gameHistoryData.length ? '- less' : '+ more'}
+            {renderedData === gameHistoryData.length ? '- less' : '+ more'}
           </Text>
         </TouchableOpacity>
       )}

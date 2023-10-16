@@ -19,20 +19,24 @@ const GameCard = props => {
   const formatedDate =
     date.getDate() + '/' + (date.getMonth() + 1) + '/' + date.getFullYear();
 
-  async () => {
+  useEffect(() => {
     if (game.media !== undefined) {
       // Fetch the image URL from Firebase Storage
-      try {
-        const url = await storage()
-          .ref('game_media/' + game.key)
-          .getDownloadURL();
-        setMediaUrl(url);
-      } catch (error) {
-        // Handle any errors that occur while fetching the image URL
-        console.error('Error fetching image URL:', error);
-      }
+      const fetchMediaUrl = async () => {
+        try {
+          const url = await storage()
+            .ref('/game_media/' + game.key)
+            .getDownloadURL();
+          setMediaUrl(url);
+        } catch (error) {
+          // Handle any errors that occur while fetching the image URL
+          console.error('Error fetching image URL:', error);
+        }
+      };
+
+      fetchMediaUrl();
     }
-  };
+  }, [game.media, game.key]);
 
   return (
     <TouchableWithoutFeedback onPress={() => setFocusView(!focusView)}>

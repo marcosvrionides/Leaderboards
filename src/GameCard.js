@@ -14,6 +14,10 @@ const GameCard = props => {
 
   const [focusView, setFocusView] = useState(false);
   const [mediaUrl, setMediaUrl] = useState();
+  const [mediaDimensions, setMediaDimensions] = useState({
+    width: 50,
+    height: 50,
+  });
 
   const date = new Date(game.timestamp);
   const formatedDate =
@@ -28,6 +32,9 @@ const GameCard = props => {
             .ref('/game_media/' + game.key)
             .getDownloadURL();
           setMediaUrl(url);
+          Image.getSize(url, (width, height) => {
+            setMediaDimensions({width: width, height: height});
+          });
         } catch (error) {
           // Handle any errors that occur while fetching the image URL
           console.error('Error fetching image URL:', error);
@@ -72,7 +79,10 @@ const GameCard = props => {
             )}
             {game.media !== undefined && (
               <Image
-                style={focusView ? styles.media_large : styles.media_small}
+                style={[
+                  {aspectRatio: mediaDimensions.width / mediaDimensions.height},
+                  focusView ? styles.media_large : styles.media_small,
+                ]}
                 src={mediaUrl}
               />
             )}
@@ -133,10 +143,10 @@ const styles = StyleSheet.create({
   media_small: {
     width: 50,
     height: 50,
+    aspectRatio: 1,
   },
   media_large: {
     width: '100%',
-    aspectRatio: 1,
   },
   note: {
     color: colors.text,

@@ -7,6 +7,7 @@ import {
   View,
   TextInput,
   Image,
+  ScrollView,
 } from 'react-native';
 import React, {useState, useEffect, useRef} from 'react';
 import colours from './Colours';
@@ -217,6 +218,7 @@ const AddGame = ({navigation, route}) => {
               handleSwitchInputRef(1);
               setFilteredPlayer1Names([]);
             }}
+            maxLength={30}
           />
 
           {filteredPlayer1Names.length > 0 && (
@@ -251,6 +253,7 @@ const AddGame = ({navigation, route}) => {
               handleSwitchInputRef(2);
               setFilteredPlayer2Names([]);
             }}
+            maxLength={30}
           />
 
           {filteredPlayer2Names.length > 0 && (
@@ -280,6 +283,7 @@ const AddGame = ({navigation, route}) => {
             onChangeText={number => setPlayer1GamesWon(number)}
             keyboardType="numeric"
             onSubmitEditing={() => handleSwitchInputRef(3)}
+            maxLength={4}
           />
 
           <TextInput
@@ -291,6 +295,7 @@ const AddGame = ({navigation, route}) => {
             onChangeText={number => setPlayer2GamesWon(number)}
             keyboardType="numeric"
             onSubmitEditing={() => handleSwitchInputRef(4)}
+            maxLength={4}
           />
 
           <View style={styles.addExtraContainer}>
@@ -301,15 +306,16 @@ const AddGame = ({navigation, route}) => {
               placeholderTextColor={colours.light_text}
               value={gameNote}
               onChangeText={string => setGameNote(string)}
+              maxLength={300}
             />
             <TouchableOpacity
               style={styles.mediaInput}
               onPress={() => handleOpenMediaPicker()}>
-              <Text>Pic? 📷</Text>
+              <Text style={{color: colours.text}}>Pic? 📷</Text>
             </TouchableOpacity>
           </View>
           {gameMedia !== undefined && (
-            <View>
+            <View style={styles.mediaContainer}>
               <TouchableOpacity
                 onPress={() => setGameMedia()}
                 style={styles.removeMediaButton}>
@@ -409,8 +415,14 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderColor: colours.text,
   },
+  mediaContainer: {
+    display: 'flex',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-evenly',
+  },
   mediaPreview: {
-    width: '100%',
+    width: '50%',
     aspectRatio: 1,
     borderWidth: 2,
     borderRadius: 10,
@@ -418,17 +430,16 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   removeMediaButton: {
-    position: 'absolute',
-    top: 20,
-    left: 10,
-    zIndex: 1,
+    height: 50,
+    width: 50,
     padding: 10,
     borderRadius: 50,
     borderWidth: 2,
-    borderColor: colours.text,
+    borderColor: colours.accent,
   },
   removeMediaButtonText: {
-    color: colours.text,
+    color: colours.accent,
     fontSize: 20,
+    textAlign: 'center',
   },
 });

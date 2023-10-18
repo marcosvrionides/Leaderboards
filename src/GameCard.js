@@ -119,15 +119,18 @@ const styles = StyleSheet.create({
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
+    maxWidth: '47.5%',
   },
   player_name: {
     color: colors.text,
     fontWeight: 'bold',
     fontSize: 20,
+    textAlign: 'center',
   },
   player_score: {
     color: colors.text,
     fontSize: 18,
+    textAlign: 'center',
   },
   date: {
     color: colors.light_text,

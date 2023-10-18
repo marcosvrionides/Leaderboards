@@ -7,9 +7,8 @@ import {
   View,
   TextInput,
   Image,
-  ScrollView,
 } from 'react-native';
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect, useRef} from 'react';
 import colours from './Colours';
 import database from '@react-native-firebase/database';
 import {ToastAndroid, FlatList} from 'react-native';
@@ -29,6 +28,12 @@ const AddGame = ({navigation, route}) => {
   const [playerNames, setPlayerNames] = useState([]);
   const [filteredPlayer1Names, setFilteredPlayer1Names] = useState([]);
   const [filteredPlayer2Names, setFilteredPlayer2Names] = useState([]);
+
+  const player1NameInputRef = useRef(null);
+  const player2NameInputRef = useRef(null);
+  const player1WinsInputRef = useRef(null);
+  const player2WinsInputRef = useRef(null);
+  const noteInputRef = useRef(null);
 
   useEffect(() => {
     const leaderboard_ref = database().ref(leaderboard);
@@ -134,12 +139,43 @@ const AddGame = ({navigation, route}) => {
     );
   };
 
+  const handleSuggestionPress = (suggestion, ref) => {
+    switch (ref) {
+      case 1:
+        setPlayer1Name(suggestion);
+        setFilteredPlayer1Names([]);
+        break;
+      case 2:
+        setPlayer2Name(suggestion);
+        setFilteredPlayer2Names([]);
+        break;
+    }
+    handleSwitchInputRef(ref);
+  };
+
+  const handleSwitchInputRef = ref => {
+    switch (ref) {
+      case 1:
+        player2NameInputRef.current.focus();
+        break;
+      case 2:
+        player1WinsInputRef.current.focus();
+        break;
+      case 3:
+        player2WinsInputRef.current.focus();
+        break;
+      case 4:
+        noteInputRef.current.focus();
+        break;
+    }
+  };
+
   return (
     <TouchableWithoutFeedback
       onPress={() => {
         Keyboard.dismiss();
       }}>
-      <ScrollView style={styles.container}>
+      <View style={styles.container}>
         <View style={styles.titleContainer}>
           <TouchableOpacity
             style={styles.backArrow}
@@ -168,6 +204,7 @@ const AddGame = ({navigation, route}) => {
 
         <View style={styles.formContainer}>
           <TextInput
+            ref={player1NameInputRef}
             style={styles.formInput}
             placeholder="Player 1 Name"
             placeholderTextColor={colours.light_text}
@@ -175,6 +212,10 @@ const AddGame = ({navigation, route}) => {
             onChangeText={text => {
               setPlayer1Name(text);
               filterPlayerNames(1, text.toLocaleLowerCase());
+            }}
+            onSubmitEditing={() => {
+              handleSwitchInputRef(1);
+              setFilteredPlayer1Names([]);
             }}
           />
 
@@ -188,8 +229,7 @@ const AddGame = ({navigation, route}) => {
                 <TouchableOpacity
                   style={styles.searchedUserContainer}
                   onPress={() => {
-                    setPlayer1Name(item);
-                    setFilteredPlayer1Names([]);
+                    handleSuggestionPress(item, 1);
                   }}>
                   <Text style={styles.searchedUserText}>{item}</Text>
                 </TouchableOpacity>
@@ -198,6 +238,7 @@ const AddGame = ({navigation, route}) => {
           )}
 
           <TextInput
+            ref={player2NameInputRef}
             style={styles.formInput}
             placeholder="Player 2 Name"
             placeholderTextColor={colours.light_text}
@@ -205,6 +246,10 @@ const AddGame = ({navigation, route}) => {
             onChangeText={text => {
               setPlayer2Name(text);
               filterPlayerNames(2, text.toLocaleLowerCase());
+            }}
+            onSubmitEditing={() => {
+              handleSwitchInputRef(2);
+              setFilteredPlayer2Names([]);
             }}
           />
 
@@ -218,8 +263,7 @@ const AddGame = ({navigation, route}) => {
                 <TouchableOpacity
                   style={styles.searchedUserContainer}
                   onPress={() => {
-                    setPlayer2Name(item);
-                    setFilteredPlayer2Names([]);
+                    handleSuggestionPress(item, 2);
                   }}>
                   <Text style={styles.searchedUserText}>{item}</Text>
                 </TouchableOpacity>
@@ -228,25 +272,30 @@ const AddGame = ({navigation, route}) => {
           )}
 
           <TextInput
+            ref={player1WinsInputRef}
             style={styles.formInput}
             placeholder="Player 1 Games Won"
             placeholderTextColor={colours.light_text}
             value={player1GamesWon}
             onChangeText={number => setPlayer1GamesWon(number)}
             keyboardType="numeric"
+            onSubmitEditing={() => handleSwitchInputRef(3)}
           />
 
           <TextInput
+            ref={player2WinsInputRef}
             style={styles.formInput}
             placeholder="Player 2 Games Won"
             placeholderTextColor={colours.light_text}
             value={player2GamesWon}
             onChangeText={number => setPlayer2GamesWon(number)}
             keyboardType="numeric"
+            onSubmitEditing={() => handleSwitchInputRef(4)}
           />
 
           <View style={styles.addExtraContainer}>
             <TextInput
+              ref={noteInputRef}
               style={styles.noteInput}
               placeholder="Add a note"
               placeholderTextColor={colours.light_text}
@@ -270,7 +319,7 @@ const AddGame = ({navigation, route}) => {
             </View>
           )}
         </View>
-      </ScrollView>
+      </View>
     </TouchableWithoutFeedback>
   );
 };
@@ -344,6 +393,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     gap: 10,
     alignItems: 'center',
+    marginVertical: 10,
   },
   noteInput: {
     color: colours.text,

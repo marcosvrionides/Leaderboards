@@ -61,7 +61,11 @@ const GameCard = props => {
         {game.media !== undefined || game.note !== undefined ? (
           <View style={styles.media_container}>
             <View
-              style={{width: '100%', height: 2, backgroundColor: colors.text}}
+              style={{
+                width: '100%',
+                height: 1,
+                backgroundColor: colors.accent,
+              }}
             />
             {game.note !== undefined && (
               <Text style={styles.note}>{game.note}</Text>
@@ -86,8 +90,9 @@ export default GameCard;
 
 const styles = StyleSheet.create({
   container: {
-    borderWidth: 2,
-    borderColor: colors.text,
+    borderWidth: 1,
+    borderColor: colors.accent,
+    backgroundColor: colors.lighter_background,
     borderRadius: 10,
     padding: 10,
     marginBottom: 10,
@@ -115,7 +120,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
   },
   date: {
-    color: colors.text,
+    color: colors.light_text,
     position: 'absolute',
     top: 5,
     left: 5,
@@ -128,14 +133,10 @@ const styles = StyleSheet.create({
   media_small: {
     width: 50,
     height: 50,
-    borderWidth: 2,
-    borderColor: colors.text,
   },
   media_large: {
     width: '100%',
     aspectRatio: 1,
-    borderWidth: 2,
-    borderColor: colors.text,
   },
   note: {
     color: colors.text,

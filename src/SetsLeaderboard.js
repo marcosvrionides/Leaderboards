@@ -200,17 +200,17 @@ const SetsLeaderboard = ({leaderboardName}) => {
           }
         }
       })
-        .slice(0, isExpanded ? LeaderboardData.length : 6)
+        .slice(0, isExpanded ? LeaderboardData.length : 3)
         .map((item, index) => (
           <View
             style={[
               styles.tableRow,
-              index === 3 && !isExpanded
+              index === 0 && !isExpanded
+                ? {opacity: 1}
+                : index === 1 && !isExpanded
                 ? {opacity: 0.75}
-                : index === 4 && !isExpanded
+                : index === 2 && !isExpanded
                 ? {opacity: 0.5}
-                : index === 5 && !isExpanded
-                ? {opacity: 0.25}
                 : {opacity: 1},
             ]}
             key={index}>
@@ -249,7 +249,7 @@ export default SetsLeaderboard;
 const styles = StyleSheet.create({
   container: {
     width: '95%',
-    backgroundColor: colours.lighter_background,
+    backgroundColor: colours.background,
     borderRadius: 10,
     elevation: 7,
     padding: 10,
@@ -268,6 +268,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-evenly',
     borderBottomWidth: 1,
+    borderColor: colours.accent,
     paddingVertical: 5,
   },
   columnHeader: {

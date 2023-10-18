@@ -66,12 +66,11 @@ export default GameHistory;
 const styles = StyleSheet.create({
   container: {
     height: 'fit-content',
-    width: '95%',
-    backgroundColor: colours.lighter_background,
+    backgroundColor: colours.background,
     borderRadius: 10,
     elevation: 7,
     padding: 10,
-    margin: 10,
+    marginHorizontal: 10,
     marginBottom: 20,
   },
   title: {

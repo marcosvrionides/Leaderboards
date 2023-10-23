@@ -1,37 +1,33 @@
 import {StyleSheet, Text, TouchableOpacity, View} from 'react-native';
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import colours from './Colours';
-import database from '@react-native-firebase/database';
-import {useFocusEffect} from '@react-navigation/native';
 import GameCard from './GameCard';
 
-const GameHistory = ({leaderboardName}) => {
-  const [gameHistoryData, setGameHistoryData] = useState([]);
+const GameHistory = ({leaderboardName, gameHistoryData, filterName}) => {
   const [renderedData, setRenderedData] = useState(5);
+  const [filteredGameHistoryData, setFiteredGameHistoryData] = useState();
 
-  useFocusEffect(
-    React.useCallback(() => {
-      setGameHistoryData([]);
-      const game_history_ref = database().ref('/' + leaderboardName);
-      game_history_ref.once('value', snapshot => {
-        const data = [];
-        snapshot.forEach(childSnapshot => {
-          if (childSnapshot.key !== 'password') {
-            const gameData = childSnapshot.val();
-            gameData.key = childSnapshot.key;
-            data.push(gameData);
-          }
-        });
-        setGameHistoryData(data);
-      });
-    }, []),
-  );
+  useEffect(() => {
+    if (filterName !== undefined) {
+      const tempGameHistoryData = gameHistoryData.filter(
+        item =>
+          item['player_1_name'] === filterName ||
+          item['player_2_name'] === filterName,
+      );
+      setFiteredGameHistoryData(tempGameHistoryData);
+    }
+  }, [filterName]);
+
+  const displayedData =
+    filteredGameHistoryData !== undefined
+      ? filteredGameHistoryData
+      : gameHistoryData;
 
   const handleLoadMore = () => {
-    if (gameHistoryData.length - renderedData > 5) {
+    if (displayedData.length - renderedData > 5) {
       setRenderedData(prevState => prevState + 5);
-    } else if (renderedData < gameHistoryData.length) {
-      setRenderedData(gameHistoryData.length);
+    } else if (renderedData < displayedData.length) {
+      setRenderedData(displayedData.length);
     } else {
       setRenderedData(5);
     }
@@ -40,7 +36,7 @@ const GameHistory = ({leaderboardName}) => {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Game History</Text>
-      {gameHistoryData
+      {displayedData
         .sort((a, b) => {
           return b.timestamp - a.timestamp;
         })
@@ -48,12 +44,12 @@ const GameHistory = ({leaderboardName}) => {
         .map((item, index) => {
           return <GameCard gameData={item} key={index} />;
         })}
-      {gameHistoryData.length > 3 && (
+      {displayedData.length > 3 && (
         <TouchableOpacity
           style={styles.showMoreButton}
           onPress={() => handleLoadMore()}>
           <Text style={styles.showMoreButtonText}>
-            {renderedData === gameHistoryData.length ? '- less' : '+ more'}
+            {renderedData === displayedData.length ? '- less' : '+ more'}
           </Text>
         </TouchableOpacity>
       )}

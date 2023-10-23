@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import Home from './src/Home';
@@ -6,6 +6,7 @@ import AddGame from './src/AddGame';
 import SelectLeaderboard from './src/SelectLeaderboard';
 import {GAMBannerAd, BannerAdSize} from 'react-native-google-mobile-ads';
 import NewLeaderboardForm from './src/NewLeaderboardForm';
+import VersionCheck from 'react-native-version-check';
 
 const App = () => {
   const Stack = createNativeStackNavigator();

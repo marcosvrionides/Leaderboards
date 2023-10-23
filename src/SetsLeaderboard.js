@@ -1,35 +1,13 @@
 import {StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import React, {useState, useEffect} from 'react';
 import colours from './Colours';
-import database from '@react-native-firebase/database';
-import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
-import {useFocusEffect} from '@react-navigation/native';
 
-const SetsLeaderboard = ({leaderboardName}) => {
+const SetsLeaderboard = ({leaderboardName, gameHistoryData}) => {
   const [isExpanded, setIsExpanded] = useState(false);
-  const [gameHistoryData, setGameHistoryData] = useState([]);
   const [LeaderboardData, setLeaderboardData] = useState([]);
   const [sortBy, setSortBy] = useState('winRate');
   const [sortAscending, setSortAscending] = useState(false);
-
-  useFocusEffect(
-    React.useCallback(() => {
-      setGameHistoryData([]);
-      setIsExpanded(false);
-      const game_history_ref = database().ref('/' + leaderboardName);
-      game_history_ref.once('value', snapshot => {
-        snapshot.forEach(childSnapshot => {
-          if (childSnapshot.key !== 'password') {
-            setGameHistoryData(previousState => [
-              ...previousState,
-              childSnapshot.val(),
-            ]);
-          }
-        });
-      });
-    }, []),
-  );
 
   useEffect(() => {
     const leaderboardDataMap = {}; // Create an empty object to store leaderboard data

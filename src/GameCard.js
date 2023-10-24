@@ -77,7 +77,7 @@ const GameCard = props => {
             {game.note !== undefined && (
               <Text style={styles.note}>{game.note}</Text>
             )}
-            {game.media !== undefined && (
+            {game.media !== undefined && mediaUrl !== undefined && (
               <Image
                 style={[
                   {aspectRatio: mediaDimensions.width / mediaDimensions.height},

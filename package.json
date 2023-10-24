@@ -10,6 +10,7 @@
     "test": "jest"
   },
   "dependencies": {
+    "@react-native-community/blur": "^4.3.2",
     "@react-native-firebase/app": "^18.5.0",
     "@react-native-firebase/database": "^18.5.0",
     "@react-native-firebase/storage": "^18.5.0",

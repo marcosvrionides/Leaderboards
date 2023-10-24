@@ -148,9 +148,8 @@ export default PlayerStats;
 const styles = StyleSheet.create({
   container: {
     backgroundColor: colors.background,
-    margin: 10,
+    marginVertical: 10,
     elevation: 7,
-    borderRadius: 10,
     padding: 10,
   },
   title: {

@@ -63,11 +63,9 @@ const styles = StyleSheet.create({
   container: {
     height: 'fit-content',
     backgroundColor: colours.background,
-    borderRadius: 10,
     elevation: 7,
     padding: 10,
-    marginHorizontal: 10,
-    marginBottom: 20,
+    marginVertical: 10,
   },
   title: {
     fontSize: 28,

@@ -226,12 +226,10 @@ export default SetsLeaderboard;
 
 const styles = StyleSheet.create({
   container: {
-    width: '95%',
     backgroundColor: colours.background,
-    borderRadius: 10,
     elevation: 7,
     padding: 10,
-    margin: 10,
+    marginVertical: 10,
     marginBottom: 20,
   },
   title: {

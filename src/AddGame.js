@@ -16,6 +16,7 @@ import {ToastAndroid, FlatList} from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import * as MediaPicker from 'react-native-image-picker';
 import storage from '@react-native-firebase/storage';
+import {BlurView} from '@react-native-community/blur';
 
 const AddGame = ({navigation, route}) => {
   const leaderboard = route.params.leaderboard;
@@ -176,7 +177,7 @@ const AddGame = ({navigation, route}) => {
       onPress={() => {
         Keyboard.dismiss();
       }}>
-      <View style={styles.container}>
+      <View>
         <View style={styles.titleContainer}>
           <TouchableOpacity
             style={styles.backArrow}
@@ -202,129 +203,143 @@ const AddGame = ({navigation, route}) => {
               </TouchableOpacity>
             )}
         </View>
-
-        <View style={styles.formContainer}>
-          <TextInput
-            ref={player1NameInputRef}
-            style={styles.formInput}
-            placeholder="Player 1 Name"
-            placeholderTextColor={colours.light_text}
-            value={player1Name}
-            onChangeText={text => {
-              setPlayer1Name(text);
-              filterPlayerNames(1, text.toLocaleLowerCase());
-            }}
-            onSubmitEditing={() => {
-              handleSwitchInputRef(1);
-              setFilteredPlayer1Names([]);
-            }}
-            maxLength={30}
-          />
-
-          {filteredPlayer1Names.length > 0 && (
-            <FlatList
-              keyboardShouldPersistTaps={'handled'}
-              style={styles.searchedUsersList}
-              data={filteredPlayer1Names.slice(0, 3)}
-              keyExtractor={item => item}
-              renderItem={({item}) => (
-                <TouchableOpacity
-                  style={styles.searchedUserContainer}
-                  onPress={() => {
-                    handleSuggestionPress(item, 1);
-                  }}>
-                  <Text style={styles.searchedUserText}>{item}</Text>
-                </TouchableOpacity>
-              )}
-            />
-          )}
-
-          <TextInput
-            ref={player2NameInputRef}
-            style={styles.formInput}
-            placeholder="Player 2 Name"
-            placeholderTextColor={colours.light_text}
-            value={player2Name}
-            onChangeText={text => {
-              setPlayer2Name(text);
-              filterPlayerNames(2, text.toLocaleLowerCase());
-            }}
-            onSubmitEditing={() => {
-              handleSwitchInputRef(2);
-              setFilteredPlayer2Names([]);
-            }}
-            maxLength={30}
-          />
-
-          {filteredPlayer2Names.length > 0 && (
-            <FlatList
-              keyboardShouldPersistTaps={'handled'}
-              style={styles.searchedUsersList}
-              data={filteredPlayer2Names.slice(0, 3)}
-              keyExtractor={item => item}
-              renderItem={({item}) => (
-                <TouchableOpacity
-                  style={styles.searchedUserContainer}
-                  onPress={() => {
-                    handleSuggestionPress(item, 2);
-                  }}>
-                  <Text style={styles.searchedUserText}>{item}</Text>
-                </TouchableOpacity>
-              )}
-            />
-          )}
-
-          <TextInput
-            ref={player1WinsInputRef}
-            style={styles.formInput}
-            placeholder="Player 1 Games Won"
-            placeholderTextColor={colours.light_text}
-            value={player1GamesWon}
-            onChangeText={number => setPlayer1GamesWon(number)}
-            keyboardType="numeric"
-            onSubmitEditing={() => handleSwitchInputRef(3)}
-            maxLength={4}
-          />
-
-          <TextInput
-            ref={player2WinsInputRef}
-            style={styles.formInput}
-            placeholder="Player 2 Games Won"
-            placeholderTextColor={colours.light_text}
-            value={player2GamesWon}
-            onChangeText={number => setPlayer2GamesWon(number)}
-            keyboardType="numeric"
-            onSubmitEditing={() => handleSwitchInputRef(4)}
-            maxLength={4}
-          />
-
-          <View style={styles.addExtraContainer}>
+        <BlurView
+          overlayColor=""
+          blurType="regular"
+          blurAmount={5}
+          style={{
+            width: '100%',
+            height: 50,
+            position: 'absolute',
+            top: 0,
+            zIndex: 1,
+          }}
+        />
+        <ScrollView style={styles.container}>
+          <View style={{height: 50}} />
+          <View style={styles.formContainer}>
             <TextInput
-              ref={noteInputRef}
-              style={styles.noteInput}
-              placeholder="Add a note"
+              ref={player1NameInputRef}
+              style={styles.formInput}
+              placeholder="Player 1 Name"
               placeholderTextColor={colours.light_text}
-              value={gameNote}
-              onChangeText={string => setGameNote(string)}
-              maxLength={300}
+              value={player1Name}
+              onChangeText={text => {
+                setPlayer1Name(text);
+                filterPlayerNames(1, text.toLocaleLowerCase());
+              }}
+              onSubmitEditing={() => {
+                handleSwitchInputRef(1);
+                setFilteredPlayer1Names([]);
+              }}
+              maxLength={30}
             />
-            <TouchableOpacity
-              style={styles.mediaInput}
-              onPress={() => handleOpenMediaPicker()}>
-              <Text style={{color: colours.text}}>Pic? 📷</Text>
-            </TouchableOpacity>
-          </View>
-          {gameMedia !== undefined && (
-            <View style={styles.mediaContainer}>
+
+            {filteredPlayer1Names.length > 0 && (
+              <FlatList
+                keyboardShouldPersistTaps={'handled'}
+                style={styles.searchedUsersList}
+                data={filteredPlayer1Names.slice(0, 3)}
+                keyExtractor={item => item}
+                renderItem={({item}) => (
+                  <TouchableOpacity
+                    style={styles.searchedUserContainer}
+                    onPress={() => {
+                      handleSuggestionPress(item, 1);
+                    }}>
+                    <Text style={styles.searchedUserText}>{item}</Text>
+                  </TouchableOpacity>
+                )}
+              />
+            )}
+
+            <TextInput
+              ref={player2NameInputRef}
+              style={styles.formInput}
+              placeholder="Player 2 Name"
+              placeholderTextColor={colours.light_text}
+              value={player2Name}
+              onChangeText={text => {
+                setPlayer2Name(text);
+                filterPlayerNames(2, text.toLocaleLowerCase());
+              }}
+              onSubmitEditing={() => {
+                handleSwitchInputRef(2);
+                setFilteredPlayer2Names([]);
+              }}
+              maxLength={30}
+            />
+
+            {filteredPlayer2Names.length > 0 && (
+              <FlatList
+                keyboardShouldPersistTaps={'handled'}
+                style={styles.searchedUsersList}
+                data={filteredPlayer2Names.slice(0, 3)}
+                keyExtractor={item => item}
+                renderItem={({item}) => (
+                  <TouchableOpacity
+                    style={styles.searchedUserContainer}
+                    onPress={() => {
+                      handleSuggestionPress(item, 2);
+                    }}>
+                    <Text style={styles.searchedUserText}>{item}</Text>
+                  </TouchableOpacity>
+                )}
+              />
+            )}
+
+            <TextInput
+              ref={player1WinsInputRef}
+              style={styles.formInput}
+              placeholder="Player 1 Games Won"
+              placeholderTextColor={colours.light_text}
+              value={player1GamesWon}
+              onChangeText={number => setPlayer1GamesWon(number)}
+              keyboardType="numeric"
+              onSubmitEditing={() => handleSwitchInputRef(3)}
+              maxLength={4}
+            />
+
+            <TextInput
+              ref={player2WinsInputRef}
+              style={styles.formInput}
+              placeholder="Player 2 Games Won"
+              placeholderTextColor={colours.light_text}
+              value={player2GamesWon}
+              onChangeText={number => setPlayer2GamesWon(number)}
+              keyboardType="numeric"
+              onSubmitEditing={() => handleSwitchInputRef(4)}
+              maxLength={4}
+            />
+
+            <View style={styles.addExtraContainer}>
+              <TextInput
+                ref={noteInputRef}
+                style={styles.noteInput}
+                placeholder="Add a note"
+                placeholderTextColor={colours.light_text}
+                value={gameNote}
+                onChangeText={string => setGameNote(string)}
+                maxLength={300}
+              />
               <TouchableOpacity
-                onPress={() => setGameMedia()}
-                style={styles.removeMediaButton}>
-                <Text style={styles.removeMediaButtonText}>X</Text>
+                style={styles.mediaInput}
+                onPress={() => handleOpenMediaPicker()}>
+                <Text style={{color: colours.text}}>Pic? 📷</Text>
               </TouchableOpacity>
-              <Image style={styles.mediaPreview} src={gameMedia} />
             </View>
-          )}
-        </View>
+            {gameMedia !== undefined && (
+              <View style={styles.mediaContainer}>
+                <TouchableOpacity
+                  onPress={() => setGameMedia()}
+                  style={styles.removeMediaButton}>
+                  <Text style={styles.removeMediaButtonText}>X</Text>
+                </TouchableOpacity>
+                <Image style={styles.mediaPreview} src={gameMedia} />
+              </View>
+            )}
+          </View>
+        </ScrollView>
       </View>
     </TouchableWithoutFeedback>
   );
@@ -335,7 +350,6 @@ export default AddGame;
 const styles = StyleSheet.create({
   container: {
     backgroundColor: colours.background,
-    height: '100%',
   },
   titleContainer: {
     display: 'flex',
@@ -343,9 +357,11 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: 10,
-    position: 'relative',
-    backgroundColor: colours.background,
-    elevation: 5,
+    backgroundColor: colours.translucent_background,
+    zIndex: 2,
+    width: '100%',
+    position: 'absolute',
+    top: 0,
   },
   title: {
     fontSize: 20,
@@ -368,9 +384,6 @@ const styles = StyleSheet.create({
   },
   formContainer: {
     backgroundColor: colours.lighter_background,
-    width: '90%',
-    margin: 20,
-    borderRadius: 10,
     elevation: 7,
     padding: 10,
   },

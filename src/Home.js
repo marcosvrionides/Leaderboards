@@ -15,6 +15,7 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 import {useFocusEffect} from '@react-navigation/native';
 import Players from './Players';
 import database from '@react-native-firebase/database';
+import {BlurView} from '@react-native-community/blur';
 
 const Home = ({navigation, route}) => {
   const leaderboard = route.params.leaderboard;
@@ -43,7 +44,25 @@ const Home = ({navigation, route}) => {
 
   return (
     <View style={styles.container}>
-      <View>
+      <BlurView
+        overlayColor=""
+        blurType="regular"
+        blurAmount={5}
+        style={{
+          width: '100%',
+          height: 90,
+          position: 'absolute',
+          top: 0,
+          zIndex: 1,
+        }}
+      />
+      <View
+        style={{
+          position: 'absolute',
+          top: 0,
+          width: '100%',
+          zIndex: 1,
+        }}>
         <View style={styles.titleContainer}>
           <TouchableOpacity
             style={styles.backArrow}
@@ -85,6 +104,7 @@ const Home = ({navigation, route}) => {
       </View>
       {currentScreen === 'home' ? (
         <ScrollView>
+          <View style={{height: 90}} />
           <SetsLeaderboard
             leaderboardName={leaderboard}
             gameHistoryData={gameHistoryData}
@@ -100,6 +120,7 @@ const Home = ({navigation, route}) => {
         </ScrollView>
       ) : (
         <ScrollView>
+          <View style={{height: 90}} />
           <Players
             leaderboardName={leaderboard}
             gameHistoryData={gameHistoryData}
@@ -125,8 +146,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 10,
     position: 'relative',
-    backgroundColor: colours.background,
-    elevation: 5,
+    backgroundColor: colours.translucent_background,
   },
   title: {
     fontSize: 20,
@@ -159,7 +179,7 @@ const styles = StyleSheet.create({
   },
   navigationBarButton: {
     padding: 10,
-    backgroundColor: colours.background,
+    backgroundColor: colours.translucent_background,
     flex: 1,
     borderColor: colours.accent,
   },

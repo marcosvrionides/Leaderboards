@@ -65,8 +65,7 @@ export default Players;
 const styles = StyleSheet.create({
   container: {
     backgroundColor: colors.background,
-    margin: 10,
-    borderRadius: 10,
+    marginVertical: 10,
     elevation: 7,
     padding: 10,
   },

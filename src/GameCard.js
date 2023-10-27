@@ -74,18 +74,28 @@ const GameCard = props => {
                 backgroundColor: colors.accent,
               }}
             />
-            {game.note !== undefined && (
-              <Text style={styles.note}>{game.note}</Text>
-            )}
-            {game.media !== undefined && mediaUrl !== undefined && (
-              <Image
-                style={[
-                  {aspectRatio: mediaDimensions.width / mediaDimensions.height},
-                  focusView ? styles.media_large : styles.media_small,
-                ]}
-                src={mediaUrl}
-              />
-            )}
+            <View
+              style={{
+                display: 'flex',
+                flexDirection: focusView ? 'column' : 'row',
+                gap: 10,
+              }}>
+              {game.media !== undefined && mediaUrl !== undefined && (
+                <Image
+                  style={[
+                    {
+                      aspectRatio:
+                        mediaDimensions.width / mediaDimensions.height,
+                    },
+                    focusView ? styles.media_large : styles.media_small,
+                  ]}
+                  src={mediaUrl}
+                />
+              )}
+              {game.note !== undefined && (
+                <Text style={styles.note}>{game.note}</Text>
+              )}
+            </View>
           </View>
         ) : null}
         <Text style={styles.date} numberOfLines={1}>
@@ -150,6 +160,8 @@ const styles = StyleSheet.create({
   },
   media_large: {
     width: '100%',
+    maxHeight: 500,
+    alignSelf: 'center',
   },
   note: {
     color: colors.text,

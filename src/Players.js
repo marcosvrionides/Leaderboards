@@ -23,7 +23,7 @@ const Players = ({leaderboardName, gameHistoryData}) => {
 
   return (
     <>
-      <View style={styles.container}>
+      <View style={styles.namesContainer}>
         {playerNames.map((name, index) => (
           <View key={index}>
             <TouchableOpacity onPress={() => setViewPlayer(name)}>
@@ -44,7 +44,7 @@ const Players = ({leaderboardName, gameHistoryData}) => {
           </View>
         ))}
       </View>
-      {viewPlayer !== undefined && (
+      {viewPlayer !== undefined ? (
         <>
           <PlayerStats
             gameHistoryData={gameHistoryData}
@@ -55,6 +55,10 @@ const Players = ({leaderboardName, gameHistoryData}) => {
             filterName={viewPlayer}
           />
         </>
+      ) : (
+        <Text style={{textAlign: 'center', color: colors.light_text}}>
+          (Tap a player to view stats)
+        </Text>
       )}
     </>
   );
@@ -63,7 +67,7 @@ const Players = ({leaderboardName, gameHistoryData}) => {
 export default Players;
 
 const styles = StyleSheet.create({
-  container: {
+  namesContainer: {
     backgroundColor: colors.background,
     marginVertical: 10,
     elevation: 7,

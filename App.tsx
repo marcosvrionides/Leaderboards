@@ -49,7 +49,7 @@ const App = () => {
         sizes={[BannerAdSize.ANCHORED_ADAPTIVE_BANNER]}
         onAdFailedToLoad={onAdFailedToLoad}
       />
-      {!updateAvailable && (
+      {updateAvailable && (
         <View style={styles.updateContainer}>
           <Text>Update available for the app</Text>
           <Button

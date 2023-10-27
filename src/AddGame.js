@@ -179,6 +179,17 @@ const AddGame = ({navigation, route}) => {
       }}>
       <View>
         <View style={styles.titleContainer}>
+          <BlurView
+            overlayColor=""
+            blurType="regular"
+            blurAmount={5}
+            style={{
+              width: '100%',
+              height: '100%',
+              position: 'absolute',
+              top: 0,
+            }}
+          />
           <TouchableOpacity
             style={styles.backArrow}
             onPress={() =>
@@ -203,37 +214,46 @@ const AddGame = ({navigation, route}) => {
               </TouchableOpacity>
             )}
         </View>
-        <BlurView
-          overlayColor=""
-          blurType="regular"
-          blurAmount={5}
-          style={{
-            width: '100%',
-            height: 50,
-            position: 'absolute',
-            top: 0,
-            zIndex: 1,
-          }}
-        />
-        <ScrollView style={styles.container}>
+        <View style={styles.container}>
           <View style={{height: 50}} />
           <View style={styles.formContainer}>
-            <TextInput
-              ref={player1NameInputRef}
-              style={styles.formInput}
-              placeholder="Player 1 Name"
-              placeholderTextColor={colours.light_text}
-              value={player1Name}
-              onChangeText={text => {
-                setPlayer1Name(text);
-                filterPlayerNames(1, text.toLocaleLowerCase());
-              }}
-              onSubmitEditing={() => {
-                handleSwitchInputRef(1);
-                setFilteredPlayer1Names([]);
-              }}
-              maxLength={30}
-            />
+            <View
+              style={{
+                display: 'flex',
+                flexDirection: 'row',
+                justifyContent: 'space-between',
+              }}>
+              {player1GamesWon > player2GamesWon && (
+                <Text style={styles.crown}>👑</Text>
+              )}
+              <TextInput
+                ref={player1NameInputRef}
+                style={styles.formInput}
+                placeholder="Player 1 Name"
+                placeholderTextColor={colours.light_text}
+                value={player1Name}
+                onChangeText={text => {
+                  setPlayer1Name(text);
+                  filterPlayerNames(1, text.toLocaleLowerCase());
+                }}
+                onSubmitEditing={() => {
+                  handleSwitchInputRef(1);
+                  setFilteredPlayer1Names([]);
+                }}
+                maxLength={30}
+              />
+              <TextInput
+                ref={player1WinsInputRef}
+                style={styles.formInput}
+                placeholder="Player 1 Games Won"
+                placeholderTextColor={colours.light_text}
+                value={player1GamesWon}
+                onChangeText={number => setPlayer1GamesWon(number)}
+                keyboardType="numeric"
+                onSubmitEditing={() => handleSwitchInputRef(3)}
+                maxLength={4}
+              />
+            </View>
 
             {filteredPlayer1Names.length > 0 && (
               <FlatList
@@ -253,22 +273,45 @@ const AddGame = ({navigation, route}) => {
               />
             )}
 
-            <TextInput
-              ref={player2NameInputRef}
-              style={styles.formInput}
-              placeholder="Player 2 Name"
-              placeholderTextColor={colours.light_text}
-              value={player2Name}
-              onChangeText={text => {
-                setPlayer2Name(text);
-                filterPlayerNames(2, text.toLocaleLowerCase());
-              }}
-              onSubmitEditing={() => {
-                handleSwitchInputRef(2);
-                setFilteredPlayer2Names([]);
-              }}
-              maxLength={30}
-            />
+            <Text style={styles.vsText}>VS</Text>
+
+            <View
+              style={{
+                display: 'flex',
+                flexDirection: 'row',
+                justifyContent: 'space-between',
+              }}>
+              {player2GamesWon > player1GamesWon && (
+                <Text style={styles.crown}>👑</Text>
+              )}
+              <TextInput
+                ref={player2NameInputRef}
+                style={styles.formInput}
+                placeholder="Player 2 Name"
+                placeholderTextColor={colours.light_text}
+                value={player2Name}
+                onChangeText={text => {
+                  setPlayer2Name(text);
+                  filterPlayerNames(2, text.toLocaleLowerCase());
+                }}
+                onSubmitEditing={() => {
+                  handleSwitchInputRef(2);
+                  setFilteredPlayer2Names([]);
+                }}
+                maxLength={30}
+              />
+              <TextInput
+                ref={player2WinsInputRef}
+                style={styles.formInput}
+                placeholder="Player 2 Games Won"
+                placeholderTextColor={colours.light_text}
+                value={player2GamesWon}
+                onChangeText={number => setPlayer2GamesWon(number)}
+                keyboardType="numeric"
+                onSubmitEditing={() => handleSwitchInputRef(4)}
+                maxLength={4}
+              />
+            </View>
 
             {filteredPlayer2Names.length > 0 && (
               <FlatList
@@ -287,30 +330,6 @@ const AddGame = ({navigation, route}) => {
                 )}
               />
             )}
-
-            <TextInput
-              ref={player1WinsInputRef}
-              style={styles.formInput}
-              placeholder="Player 1 Games Won"
-              placeholderTextColor={colours.light_text}
-              value={player1GamesWon}
-              onChangeText={number => setPlayer1GamesWon(number)}
-              keyboardType="numeric"
-              onSubmitEditing={() => handleSwitchInputRef(3)}
-              maxLength={4}
-            />
-
-            <TextInput
-              ref={player2WinsInputRef}
-              style={styles.formInput}
-              placeholder="Player 2 Games Won"
-              placeholderTextColor={colours.light_text}
-              value={player2GamesWon}
-              onChangeText={number => setPlayer2GamesWon(number)}
-              keyboardType="numeric"
-              onSubmitEditing={() => handleSwitchInputRef(4)}
-              maxLength={4}
-            />
 
             <View style={styles.addExtraContainer}>
               <TextInput
@@ -339,7 +358,7 @@ const AddGame = ({navigation, route}) => {
               </View>
             )}
           </View>
-        </ScrollView>
+        </View>
       </View>
     </TouchableWithoutFeedback>
   );
@@ -350,6 +369,7 @@ export default AddGame;
 const styles = StyleSheet.create({
   container: {
     backgroundColor: colours.background,
+    height: '100%',
   },
   titleContainer: {
     display: 'flex',
@@ -393,6 +413,7 @@ const styles = StyleSheet.create({
     marginVertical: 10,
     padding: 10,
     borderRadius: 5,
+    flex: 0.49,
   },
   searchedUserContainer: {
     backgroundColor: colours.secondary,
@@ -412,7 +433,8 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     gap: 10,
     alignItems: 'center',
-    marginVertical: 10,
+    marginTop: 20,
+    marginBottom: 10,
   },
   noteInput: {
     color: colours.text,
@@ -454,5 +476,18 @@ const styles = StyleSheet.create({
     color: colours.accent,
     fontSize: 20,
     textAlign: 'center',
+  },
+  vsText: {
+    textAlign: 'center',
+    color: colours.accent,
+    fontSize: 20,
+    fontWeight: 'bold',
+    fontStyle: 'italic',
+  },
+  crown: {
+    position: 'absolute',
+    zIndex: 1,
+    top: 10,
+    left: 0,
   },
 });

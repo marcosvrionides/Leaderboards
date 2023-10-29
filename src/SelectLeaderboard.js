@@ -320,6 +320,9 @@ const SelectLeaderboard = ({navigation}) => {
               />
             </View>
           </TouchableWithoutFeedback>
+          <Text style={styles.selectLeaderboardText}>
+            Select a Leaderboard:
+          </Text>
           {filteredLeaderboards.slice(0, 7).map((leaderboard, index) => (
             <View key={index}>
               <TouchableOpacity
@@ -327,8 +330,10 @@ const SelectLeaderboard = ({navigation}) => {
                 onPress={() => handleOpenLeaderboard(leaderboard)}
                 onLongPress={() => handleLongPress(leaderboard)}>
                 <Text style={styles.gameText}>
+                  {pinnedLeaderboards.includes(leaderboard) ? '📌 ' : ''}
+                </Text>
+                <Text style={styles.gameText} numberOfLines={2}>
                   {leaderboard}
-                  {pinnedLeaderboards.includes(leaderboard) ? ' 📌' : ''}
                 </Text>
               </TouchableOpacity>
               {index !== filteredLeaderboards.length - 1 && (
@@ -386,10 +391,14 @@ const styles = StyleSheet.create({
   },
   game: {
     padding: 5,
+    display: 'flex',
+    flexDirection: 'row',
+    justifyContent: 'left',
   },
   gameText: {
     fontSize: 20,
     color: colours.text,
+    maxWidth: '90%',
   },
   newLeaderboardContainer: {
     backgroundColor: colours.accent,
@@ -512,5 +521,9 @@ const styles = StyleSheet.create({
   pinButtonsText: {
     color: colours.text,
     fontSize: 18,
+  },
+  selectLeaderboardText: {
+    color: colours.light_text,
+    fontSize: 15,
   },
 });

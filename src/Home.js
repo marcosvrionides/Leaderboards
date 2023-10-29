@@ -88,7 +88,9 @@ const Home = ({navigation, route}) => {
               color={colours.text}
             />
           </TouchableOpacity>
-          <Text style={styles.title}>{leaderboard}</Text>
+          <Text style={styles.title} numberOfLines={1}>
+            {leaderboard}
+          </Text>
           <TouchableOpacity
             style={styles.addGameButton}
             onPress={() =>

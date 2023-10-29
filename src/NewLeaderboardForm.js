@@ -6,8 +6,9 @@ import {
   TextInput,
   ToastAndroid,
   Switch,
+  BackHandler,
 } from 'react-native';
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import colours from './Colours';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import database from '@react-native-firebase/database';
@@ -43,6 +44,20 @@ const NewLeaderboardForm = ({navigation}) => {
     databaseRef.push(leaderboardPassword);
     navigation.navigate('home', {leaderboard: leaderboardName});
   };
+
+  useEffect(() => {
+    const handleNavigateBack = () => {
+      navigation.navigate('selectLeaderboard');
+      return true;
+    };
+
+    const backHandler = BackHandler.addEventListener(
+      'hardwareBackPress',
+      handleNavigateBack,
+    );
+
+    return () => backHandler.remove();
+  }, []);
 
   return (
     <View style={styles.container}>

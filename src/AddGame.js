@@ -18,6 +18,7 @@ import * as MediaPicker from 'react-native-image-picker';
 import storage from '@react-native-firebase/storage';
 import {BlurView} from '@react-native-community/blur';
 import SQLiteStorage from 'react-native-sqlite-storage';
+import InAppReview from 'react-native-in-app-review';
 
 const AddGame = ({navigation, route}) => {
   const leaderboard = route.params.leaderboard;
@@ -163,6 +164,28 @@ const AddGame = ({navigation, route}) => {
     });
 
     ToastAndroid.show('Game Saved.', ToastAndroid.SHORT);
+
+    if (InAppReview.isAvailable()) {
+      InAppReview.RequestInAppReview()
+        .then(hasFlowFinishedSuccessfully => {
+          // when return true in android it means user finished or close review flow
+          console.log('InAppReview in android', hasFlowFinishedSuccessfully);
+
+          // when return true in ios it means review flow lanuched to user.
+          console.log(
+            'InAppReview in ios has launched successfully',
+            hasFlowFinishedSuccessfully,
+          );
+          if (hasFlowFinishedSuccessfully) {
+            navigation.navigate('home', {leaderboard: leaderboard});
+            return;
+          }
+        })
+        .catch(error => {
+          console.log(error);
+        });
+    }
+
     navigation.navigate('home', {leaderboard: leaderboard});
   };
 
@@ -204,10 +227,10 @@ const AddGame = ({navigation, route}) => {
         player1WinsInputRef.current.focus();
         break;
       case 2:
-        player2NameInputRef.current.focus();
+        player2WinsInputRef.current.focus();
         break;
       case 3:
-        player2WinsInputRef.current.focus();
+        player2NameInputRef.current.focus();
         break;
       case 4:
         noteInputRef.current.focus();
@@ -307,7 +330,7 @@ const AddGame = ({navigation, route}) => {
                 value={player1GamesWon}
                 onChangeText={number => setPlayer1GamesWon(number)}
                 keyboardType="numeric"
-                onSubmitEditing={() => handleSwitchInputRef(2)}
+                onSubmitEditing={() => handleSwitchInputRef(3)}
                 maxLength={4}
               />
             </View>

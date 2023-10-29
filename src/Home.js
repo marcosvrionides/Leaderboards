@@ -118,34 +118,33 @@ const Home = ({navigation, route}) => {
           </TouchableOpacity>
         </View>
       </View>
-      <ScrollView
-        horizontal
-        contentContainerStyle={{width: '200%'}}
-        pagingEnabled>
-        <ScrollView style={{width: '50%'}}>
-          <View style={{height: 90}} />
-          <SetsLeaderboard
-            leaderboardName={leaderboard}
-            gameHistoryData={gameHistoryData}
-          />
-          <Leaderboard
-            leaderboardName={leaderboard}
-            gameHistoryData={gameHistoryData}
-          />
-          <GameHistory
-            leaderboardName={leaderboard}
-            gameHistoryData={gameHistoryData}
-          />
-        </ScrollView>
-
-        <ScrollView style={{width: '50%'}}>
-          <View style={{height: 90}} />
-          <Players
-            leaderboardName={leaderboard}
-            gameHistoryData={gameHistoryData}
-          />
-        </ScrollView>
-      </ScrollView>
+      <View>
+        {currentScreen === 'home' ? (
+          <ScrollView>
+            <View style={{height: 90}} />
+            <SetsLeaderboard
+              leaderboardName={leaderboard}
+              gameHistoryData={gameHistoryData}
+            />
+            <Leaderboard
+              leaderboardName={leaderboard}
+              gameHistoryData={gameHistoryData}
+            />
+            <GameHistory
+              leaderboardName={leaderboard}
+              gameHistoryData={gameHistoryData}
+            />
+          </ScrollView>
+        ) : currentScreen === 'players' ? (
+          <ScrollView>
+            <View style={{height: 90}} />
+            <Players
+              leaderboardName={leaderboard}
+              gameHistoryData={gameHistoryData}
+            />
+          </ScrollView>
+        ) : null}
+      </View>
     </View>
   );
 };

@@ -17,7 +17,6 @@ import colours from './Colours';
 import database from '@react-native-firebase/database';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import SQLiteStorage from 'react-native-sqlite-storage';
-import messaging from '@react-native-firebase/messaging';
 
 const SelectLeaderboard = ({navigation}) => {
   const [leaderboards, setLeaderboards] = useState([]);
@@ -205,20 +204,6 @@ const SelectLeaderboard = ({navigation}) => {
     setRefresh(!refresh);
   };
 
-  const subscribeToTopic = () => {
-    console.log('start sub');
-    messaging()
-      .subscribeToTopic('/leaderboard/' + selectedLeaderboard)
-      .then(() => console.log('Subscribed to ' + selectedLeaderboard));
-  };
-
-  const unSubscribeToTopic = () => {
-    console.log('start unsub');
-    messaging()
-      .unSubscribeToTopic('/leaderboard/' + selectedLeaderboard)
-      .then(() => console.log('Unsubscribed from ' + selectedLeaderboard));
-  };
-
   useEffect(() => {
     const handleNavigateBack = () => {
       // navigation.navigate('selectLeaderboard');
@@ -335,7 +320,7 @@ const SelectLeaderboard = ({navigation}) => {
               />
             </View>
           </TouchableWithoutFeedback>
-          {filteredLeaderboards.slice(0, 5).map((leaderboard, index) => (
+          {filteredLeaderboards.slice(0, 7).map((leaderboard, index) => (
             <View key={index}>
               <TouchableOpacity
                 style={styles.game}

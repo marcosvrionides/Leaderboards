@@ -17,6 +17,7 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 import * as MediaPicker from 'react-native-image-picker';
 import storage from '@react-native-firebase/storage';
 import {BlurView} from '@react-native-community/blur';
+import SQLiteStorage from 'react-native-sqlite-storage';
 
 const AddGame = ({navigation, route}) => {
   const leaderboard = route.params.leaderboard;
@@ -110,7 +111,7 @@ const AddGame = ({navigation, route}) => {
       player_2_name: player2Name.trim(),
       player_1_games_won: player1GamesWon.trim(),
       player_2_games_won: player2GamesWon.trim(),
-      note: gameNote.trim(),
+      note: gameNote,
       media: gameMedia,
       timestamp: database.ServerValue.TIMESTAMP,
     });
@@ -118,6 +119,48 @@ const AddGame = ({navigation, route}) => {
     if (gameMedia !== undefined) {
       uploadMedia(newGameRef.key);
     }
+
+    // Open or create the database
+    const db = SQLiteStorage.openDatabase(
+      {
+        name: 'myDatabase.db',
+        location: 'default',
+      },
+      () => {
+        return;
+      },
+      error => {
+        console.error('Error opening database:', error);
+      },
+    );
+
+    // Create a table
+    db.transaction(tx => {
+      tx.executeSql(
+        'CREATE TABLE IF NOT EXISTS pinned_leaderboards (id INTEGER PRIMARY KEY AUTOINCREMENT, leaderboard_name TEXT)',
+        [],
+        () => {
+          return;
+        },
+        error => {
+          console.error('Error creating table:', error);
+        },
+      );
+    });
+
+    // Insert data into the table
+    db.transaction(tx => {
+      tx.executeSql(
+        'INSERT INTO pinned_leaderboards (leaderboard_name) VALUES (?)',
+        [leaderboard],
+        () => {
+          return;
+        },
+        error => {
+          console.error('Error inserting data:', error);
+        },
+      );
+    });
 
     ToastAndroid.show('Game Saved.', ToastAndroid.SHORT);
     navigation.navigate('home', {leaderboard: leaderboard});

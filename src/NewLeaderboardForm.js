@@ -12,6 +12,7 @@ import React, {useEffect, useState} from 'react';
 import colours from './Colours';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import database from '@react-native-firebase/database';
+import SQLiteStorage from 'react-native-sqlite-storage';
 
 const NewLeaderboardForm = ({navigation}) => {
   const [leaderboardName, setLeaderboardName] = useState('');
@@ -42,6 +43,49 @@ const NewLeaderboardForm = ({navigation}) => {
     }
     const databaseRef = database().ref('/' + leaderboardName + '/password');
     databaseRef.push(leaderboardPassword);
+
+    // Open or create the database
+    const db = SQLiteStorage.openDatabase(
+      {
+        name: 'myDatabase.db',
+        location: 'default',
+      },
+      () => {
+        return;
+      },
+      error => {
+        console.error('Error opening database:', error);
+      },
+    );
+
+    // Create a table
+    db.transaction(tx => {
+      tx.executeSql(
+        'CREATE TABLE IF NOT EXISTS pinned_leaderboards (id INTEGER PRIMARY KEY AUTOINCREMENT, leaderboard_name TEXT)',
+        [],
+        () => {
+          return;
+        },
+        error => {
+          console.error('Error creating table:', error);
+        },
+      );
+    });
+
+    // Insert data into the table
+    db.transaction(tx => {
+      tx.executeSql(
+        'INSERT INTO pinned_leaderboards (leaderboard_name) VALUES (?)',
+        [leaderboardName],
+        () => {
+          return;
+        },
+        error => {
+          console.error('Error inserting data:', error);
+        },
+      );
+    });
+
     navigation.navigate('home', {leaderboard: leaderboardName});
   };
 

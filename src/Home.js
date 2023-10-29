@@ -3,8 +3,9 @@ import {
   StyleSheet,
   Text,
   TouchableOpacity,
-  TouchableWithoutFeedback,
   View,
+  BackHandler,
+  Alert,
 } from 'react-native';
 import React, {useEffect, useState} from 'react';
 import colours from './Colours';
@@ -41,6 +42,20 @@ const Home = ({navigation, route}) => {
       });
     }, []),
   );
+
+  useEffect(() => {
+    const handleNavigateBack = () => {
+      navigation.navigate('selectLeaderboard');
+      return true;
+    };
+
+    const backHandler = BackHandler.addEventListener(
+      'hardwareBackPress',
+      handleNavigateBack,
+    );
+
+    return () => backHandler.remove();
+  }, []);
 
   return (
     <View style={styles.container}>
@@ -101,8 +116,11 @@ const Home = ({navigation, route}) => {
           </TouchableOpacity>
         </View>
       </View>
-      {currentScreen === 'home' ? (
-        <ScrollView>
+      <ScrollView
+        horizontal
+        contentContainerStyle={{width: '200%'}}
+        pagingEnabled>
+        <ScrollView style={{width: '50%'}}>
           <View style={{height: 90}} />
           <SetsLeaderboard
             leaderboardName={leaderboard}
@@ -117,15 +135,15 @@ const Home = ({navigation, route}) => {
             gameHistoryData={gameHistoryData}
           />
         </ScrollView>
-      ) : (
-        <ScrollView>
+
+        <ScrollView style={{width: '50%'}}>
           <View style={{height: 90}} />
           <Players
             leaderboardName={leaderboard}
             gameHistoryData={gameHistoryData}
           />
         </ScrollView>
-      )}
+      </ScrollView>
     </View>
   );
 };

@@ -8,15 +8,16 @@ import {
   View,
   ToastAndroid,
   Modal,
+  Alert,
+  BackHandler,
 } from 'react-native';
 import React, {useRef, useState, useEffect} from 'react';
 import {useFocusEffect} from '@react-navigation/native';
 import colours from './Colours';
 import database from '@react-native-firebase/database';
-import {GAMBannerAd} from 'react-native-google-mobile-ads';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import SQLiteStorage from 'react-native-sqlite-storage';
-import SetsLeaderboard from './SetsLeaderboard';
+import messaging from '@react-native-firebase/messaging';
 
 const SelectLeaderboard = ({navigation}) => {
   const [leaderboards, setLeaderboards] = useState([]);
@@ -161,7 +162,7 @@ const SelectLeaderboard = ({navigation}) => {
         'CREATE TABLE IF NOT EXISTS pinned_leaderboards (id INTEGER PRIMARY KEY AUTOINCREMENT, leaderboard_name TEXT)',
         [],
         () => {
-          console.log('Table created successfully');
+          return;
         },
         error => {
           console.error('Error creating table:', error);
@@ -176,7 +177,7 @@ const SelectLeaderboard = ({navigation}) => {
           'DELETE FROM pinned_leaderboards WHERE leaderboard_name = ?',
           [selectedLeaderboard],
           () => {
-            console.log('Leaderboard removed successfully');
+            unSubscribeToTopic();
           },
           error => {
             console.error('Error removing leaderboard:', error);
@@ -191,6 +192,7 @@ const SelectLeaderboard = ({navigation}) => {
           [selectedLeaderboard],
           () => {
             ToastAndroid.show('Added to favourites.', ToastAndroid.SHORT);
+            subscribeToTopic();
           },
           error => {
             console.error('Error inserting data:', error);
@@ -202,6 +204,42 @@ const SelectLeaderboard = ({navigation}) => {
     setShowPinPopup(false);
     setRefresh(!refresh);
   };
+
+  const subscribeToTopic = () => {
+    console.log('start sub');
+    messaging()
+      .subscribeToTopic('/leaderboard/' + selectedLeaderboard)
+      .then(() => console.log('Subscribed to ' + selectedLeaderboard));
+  };
+
+  const unSubscribeToTopic = () => {
+    console.log('start unsub');
+    messaging()
+      .unSubscribeToTopic('/leaderboard/' + selectedLeaderboard)
+      .then(() => console.log('Unsubscribed from ' + selectedLeaderboard));
+  };
+
+  useEffect(() => {
+    const handleNavigateBack = () => {
+      // navigation.navigate('selectLeaderboard');
+      Alert.alert('Hold on!', 'Are you sure you want to exit?', [
+        {
+          text: 'Cancel',
+          onPress: () => null,
+          style: 'cancel',
+        },
+        {text: 'YES', onPress: () => BackHandler.exitApp()},
+      ]);
+      return true;
+    };
+
+    const backHandler = BackHandler.addEventListener(
+      'hardwareBackPress',
+      handleNavigateBack,
+    );
+
+    return () => backHandler.remove();
+  }, []);
 
   return (
     <TouchableWithoutFeedback

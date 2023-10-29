@@ -7,7 +7,7 @@ import {
   View,
   TextInput,
   Image,
-  ScrollView,
+  BackHandler,
 } from 'react-native';
 import React, {useState, useEffect, useRef} from 'react';
 import colours from './Colours';
@@ -106,11 +106,11 @@ const AddGame = ({navigation, route}) => {
     }
     const game_history_ref = database().ref('/' + leaderboard);
     const newGameRef = game_history_ref.push({
-      player_1_name: player1Name,
-      player_2_name: player2Name,
-      player_1_games_won: player1GamesWon,
-      player_2_games_won: player2GamesWon,
-      note: gameNote,
+      player_1_name: player1Name.trim(),
+      player_2_name: player2Name.trim(),
+      player_1_games_won: player1GamesWon.trim(),
+      player_2_games_won: player2GamesWon.trim(),
+      note: gameNote.trim(),
       media: gameMedia,
       timestamp: database.ServerValue.TIMESTAMP,
     });
@@ -158,10 +158,10 @@ const AddGame = ({navigation, route}) => {
   const handleSwitchInputRef = ref => {
     switch (ref) {
       case 1:
-        player2NameInputRef.current.focus();
+        player1WinsInputRef.current.focus();
         break;
       case 2:
-        player1WinsInputRef.current.focus();
+        player2NameInputRef.current.focus();
         break;
       case 3:
         player2WinsInputRef.current.focus();
@@ -171,6 +171,20 @@ const AddGame = ({navigation, route}) => {
         break;
     }
   };
+
+  useEffect(() => {
+    const handleNavigateBack = () => {
+      navigation.navigate('home', {leaderboard: leaderboard});
+      return true;
+    };
+
+    const backHandler = BackHandler.addEventListener(
+      'hardwareBackPress',
+      handleNavigateBack,
+    );
+
+    return () => backHandler.remove();
+  }, []);
 
   return (
     <TouchableWithoutFeedback
@@ -250,7 +264,7 @@ const AddGame = ({navigation, route}) => {
                 value={player1GamesWon}
                 onChangeText={number => setPlayer1GamesWon(number)}
                 keyboardType="numeric"
-                onSubmitEditing={() => handleSwitchInputRef(3)}
+                onSubmitEditing={() => handleSwitchInputRef(2)}
                 maxLength={4}
               />
             </View>
@@ -295,7 +309,7 @@ const AddGame = ({navigation, route}) => {
                   filterPlayerNames(2, text.toLocaleLowerCase());
                 }}
                 onSubmitEditing={() => {
-                  handleSwitchInputRef(2);
+                  handleSwitchInputRef(3);
                   setFilteredPlayer2Names([]);
                 }}
                 maxLength={30}

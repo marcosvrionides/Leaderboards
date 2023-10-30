@@ -257,19 +257,9 @@ const AddGame = ({navigation, route}) => {
       onPress={() => {
         Keyboard.dismiss();
       }}>
-      <View>
+      <View
+        style={{backgroundColor: colours.lighter_background, height: '100%'}}>
         <View style={styles.titleContainer}>
-          <BlurView
-            overlayColor=""
-            blurType="regular"
-            blurAmount={5}
-            style={{
-              width: '100%',
-              height: '100%',
-              position: 'absolute',
-              top: 0,
-            }}
-          />
           <TouchableOpacity
             style={styles.backArrow}
             onPress={() =>
@@ -447,10 +437,6 @@ const AddGame = ({navigation, route}) => {
 export default AddGame;
 
 const styles = StyleSheet.create({
-  container: {
-    backgroundColor: colours.background,
-    height: '100%',
-  },
   titleContainer: {
     display: 'flex',
     flexDirection: 'row',
@@ -462,6 +448,7 @@ const styles = StyleSheet.create({
     width: '100%',
     position: 'absolute',
     top: 0,
+    backgroundColor: 'rgba(255, 255, 255, 0.9)',
   },
   title: {
     fontSize: 20,
@@ -484,7 +471,6 @@ const styles = StyleSheet.create({
   },
   formContainer: {
     backgroundColor: colours.lighter_background,
-    elevation: 7,
     padding: 10,
   },
   formInput: {

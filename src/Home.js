@@ -65,18 +65,8 @@ const Home = ({navigation, route}) => {
           top: 0,
           width: '100%',
           zIndex: 1,
+          backgroundColor: 'rgba(255, 255, 255, 0.9)',
         }}>
-        <BlurView
-          overlayColor=""
-          blurType="regular"
-          blurAmount={5}
-          style={{
-            width: '100%',
-            height: '100%',
-            position: 'absolute',
-            top: 0,
-          }}
-        />
         <View style={styles.titleContainer}>
           <TouchableOpacity
             style={styles.backArrow}

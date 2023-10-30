@@ -2,6 +2,7 @@ import {StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import React, {useEffect, useState} from 'react';
 import colours from './Colours';
 import GameCard from './GameCard';
+import LoadingScreen from './LoadingScreen';
 
 const GameHistory = ({leaderboardName, gameHistoryData, filterName}) => {
   const [renderedData, setRenderedData] = useState(5);
@@ -36,14 +37,18 @@ const GameHistory = ({leaderboardName, gameHistoryData, filterName}) => {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Game History</Text>
-      {displayedData
-        .sort((a, b) => {
-          return b.timestamp - a.timestamp;
-        })
-        .slice(0, renderedData)
-        .map((item, index) => {
-          return <GameCard gameData={item} key={index} />;
-        })}
+      {gameHistoryData.length === 0 ? (
+        <LoadingScreen />
+      ) : (
+        displayedData
+          .sort((a, b) => {
+            return b.timestamp - a.timestamp;
+          })
+          .slice(0, renderedData)
+          .map((item, index) => {
+            return <GameCard gameData={item} key={index} />;
+          })
+      )}
       {displayedData.length > 3 && (
         <TouchableOpacity
           style={styles.showMoreButton}

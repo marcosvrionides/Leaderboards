@@ -17,6 +17,7 @@ import colours from './Colours';
 import database from '@react-native-firebase/database';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import SQLiteStorage from 'react-native-sqlite-storage';
+import LoadingScreen from './LoadingScreen';
 
 const SelectLeaderboard = ({navigation}) => {
   const [leaderboards, setLeaderboards] = useState([]);
@@ -323,24 +324,28 @@ const SelectLeaderboard = ({navigation}) => {
           <Text style={styles.selectLeaderboardText}>
             Select a Leaderboard:
           </Text>
-          {filteredLeaderboards.slice(0, 7).map((leaderboard, index) => (
-            <View key={index}>
-              <TouchableOpacity
-                style={styles.game}
-                onPress={() => handleOpenLeaderboard(leaderboard)}
-                onLongPress={() => handleLongPress(leaderboard)}>
-                <Text style={styles.gameText}>
-                  {pinnedLeaderboards.includes(leaderboard) ? '📌 ' : ''}
-                </Text>
-                <Text style={styles.gameText} numberOfLines={2}>
-                  {leaderboard}
-                </Text>
-              </TouchableOpacity>
-              {index !== filteredLeaderboards.length - 1 && (
-                <View style={styles.separator} />
-              )}
-            </View>
-          ))}
+          {leaderboards.length === 0 ? (
+            <LoadingScreen />
+          ) : (
+            filteredLeaderboards.slice(0, 7).map((leaderboard, index) => (
+              <View key={index}>
+                <TouchableOpacity
+                  style={styles.game}
+                  onPress={() => handleOpenLeaderboard(leaderboard)}
+                  onLongPress={() => handleLongPress(leaderboard)}>
+                  <Text style={styles.gameText}>
+                    {pinnedLeaderboards.includes(leaderboard) ? '📌 ' : ''}
+                  </Text>
+                  <Text style={styles.gameText} numberOfLines={2}>
+                    {leaderboard}
+                  </Text>
+                </TouchableOpacity>
+                {index !== filteredLeaderboards.length - 1 && (
+                  <View style={styles.separator} />
+                )}
+              </View>
+            ))
+          )}
         </View>
         <Text style={colours.light_text}>
           (Long press to pin a leaderboard)

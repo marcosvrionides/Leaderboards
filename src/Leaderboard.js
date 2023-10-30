@@ -2,6 +2,7 @@ import {StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import React, {useState, useEffect} from 'react';
 import colours from './Colours';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
+import LoadingScreen from './LoadingScreen';
 
 const Leaderboard = ({leaderboardName, gameHistoryData}) => {
   const [isExpanded, setIsExpanded] = useState(false);
@@ -133,58 +134,62 @@ const Leaderboard = ({leaderboardName, gameHistoryData}) => {
           </Text>
         </TouchableOpacity>
       </View>
-      {LeaderboardData.sort((a, b) => {
-        if (sortBy === 'wins') {
-          if (sortAscending) {
-            return a.wins - b.wins;
-          } else {
-            return b.wins - a.wins;
+      {gameHistoryData.length === 0 ? (
+        <LoadingScreen />
+      ) : (
+        LeaderboardData.sort((a, b) => {
+          if (sortBy === 'wins') {
+            if (sortAscending) {
+              return a.wins - b.wins;
+            } else {
+              return b.wins - a.wins;
+            }
+          } else if (sortBy === 'losses') {
+            if (sortAscending) {
+              return a.losses - b.losses;
+            } else {
+              return b.losses - a.losses;
+            }
+          } else if (sortBy === 'winRate') {
+            if (sortAscending) {
+              return a.winRate - b.winRate;
+            } else {
+              return b.winRate - a.winRate;
+            }
           }
-        } else if (sortBy === 'losses') {
-          if (sortAscending) {
-            return a.losses - b.losses;
-          } else {
-            return b.losses - a.losses;
-          }
-        } else if (sortBy === 'winRate') {
-          if (sortAscending) {
-            return a.winRate - b.winRate;
-          } else {
-            return b.winRate - a.winRate;
-          }
-        }
-      })
-        .slice(0, isExpanded ? LeaderboardData.length : 3)
-        .map((item, index) => (
-          <View
-            style={[
-              styles.tableRow,
-              index === 0 && !isExpanded
-                ? {opacity: 1}
-                : index === 1 && !isExpanded
-                ? {opacity: 0.75}
-                : index === 2 && !isExpanded
-                ? {opacity: 0.5}
-                : {opacity: 1},
-            ]}
-            key={index}>
-            <Text style={[styles.tableCell, styles.narrowColumn]}>
-              {index + 1}
-            </Text>
-            <Text style={styles.tableCell} numberOfLines={1}>
-              {item.player}
-            </Text>
-            <Text style={styles.tableCell} numberOfLines={1}>
-              {item.wins}
-            </Text>
-            <Text style={styles.tableCell} numberOfLines={1}>
-              {item.losses}
-            </Text>
-            <Text style={styles.tableCell} numberOfLines={1}>
-              {item.winRate}%
-            </Text>
-          </View>
-        ))}
+        })
+          .slice(0, isExpanded ? LeaderboardData.length : 3)
+          .map((item, index) => (
+            <View
+              style={[
+                styles.tableRow,
+                index === 0 && !isExpanded
+                  ? {opacity: 1}
+                  : index === 1 && !isExpanded
+                  ? {opacity: 0.75}
+                  : index === 2 && !isExpanded
+                  ? {opacity: 0.5}
+                  : {opacity: 1},
+              ]}
+              key={index}>
+              <Text style={[styles.tableCell, styles.narrowColumn]}>
+                {index + 1}
+              </Text>
+              <Text style={styles.tableCell} numberOfLines={1}>
+                {item.player}
+              </Text>
+              <Text style={styles.tableCell} numberOfLines={1}>
+                {item.wins}
+              </Text>
+              <Text style={styles.tableCell} numberOfLines={1}>
+                {item.losses}
+              </Text>
+              <Text style={styles.tableCell} numberOfLines={1}>
+                {item.winRate}%
+              </Text>
+            </View>
+          ))
+      )}
       {LeaderboardData.length > 3 && (
         <TouchableOpacity
           style={styles.showMoreButton}

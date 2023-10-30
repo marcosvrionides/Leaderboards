@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import {PermissionsAndroid, StyleSheet} from 'react-native';
 import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
@@ -9,6 +9,7 @@ import {GAMBannerAd, BannerAdSize} from 'react-native-google-mobile-ads';
 import NewLeaderboardForm from './src/NewLeaderboardForm';
 import messaging from '@react-native-firebase/messaging';
 import colors from './src/Colours';
+import auth from '@react-native-firebase/auth';
 
 const App = () => {
   PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS);
@@ -23,6 +24,25 @@ const App = () => {
   const onAdFailedToLoad = error => {
     console.log('error loading ad', error.message);
   };
+
+  const handleGuestLogin = async () => {
+    auth()
+      .signInAnonymously()
+      .then(() => {
+        console.log('User signed in anonymously');
+      })
+      .catch(error => {
+        if (error.code === 'auth/operation-not-allowed') {
+          console.log('Enable anonymous in your firebase console.');
+        }
+
+        console.error(error);
+      });
+  };
+
+  useEffect(() => {
+    handleGuestLogin();
+  }, []);
 
   return (
     <>

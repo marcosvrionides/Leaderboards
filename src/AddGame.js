@@ -16,9 +16,9 @@ import {ToastAndroid, FlatList} from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import * as MediaPicker from 'react-native-image-picker';
 import storage from '@react-native-firebase/storage';
-import {BlurView} from '@react-native-community/blur';
 import SQLiteStorage from 'react-native-sqlite-storage';
 import InAppReview from 'react-native-in-app-review';
+import auth from '@react-native-firebase/auth';
 
 const AddGame = ({navigation, route}) => {
   const leaderboard = route.params.leaderboard;
@@ -162,6 +162,11 @@ const AddGame = ({navigation, route}) => {
         },
       );
     });
+
+    const pinnedLeaderboardsRef = database().ref(
+      '/users/' + auth().currentUser.uid + '/pins/' + leaderboard,
+    );
+    pinnedLeaderboardsRef.set(true);
 
     ToastAndroid.show('Game Saved.', ToastAndroid.SHORT);
 

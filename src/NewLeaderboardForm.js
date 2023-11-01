@@ -13,6 +13,7 @@ import colours from './Colours';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import database from '@react-native-firebase/database';
 import SQLiteStorage from 'react-native-sqlite-storage';
+import auth from '@react-native-firebase/auth';
 
 const NewLeaderboardForm = ({navigation}) => {
   const [leaderboardName, setLeaderboardName] = useState('');
@@ -24,7 +25,11 @@ const NewLeaderboardForm = ({navigation}) => {
     setLeaderboardName(text);
     const databaseRef = database().ref('/' + text);
     databaseRef.once('value', snapshot => {
-      if (snapshot.exists()) {
+      if (
+        snapshot.exists() ||
+        text.trim() === 'password' ||
+        text.trim() === 'users'
+      ) {
         setNameInUse(true);
       } else {
         setNameInUse(false);
@@ -44,47 +49,10 @@ const NewLeaderboardForm = ({navigation}) => {
     const databaseRef = database().ref('/' + leaderboardName + '/password');
     databaseRef.push(leaderboardPassword);
 
-    // Open or create the database
-    const db = SQLiteStorage.openDatabase(
-      {
-        name: 'myDatabase.db',
-        location: 'default',
-      },
-      () => {
-        return;
-      },
-      error => {
-        console.error('Error opening database:', error);
-      },
+    const pinnedLeaderboardsRef = database().ref(
+      '/users/' + auth().currentUser.uid + '/pins/' + leaderboardName,
     );
-
-    // Create a table
-    db.transaction(tx => {
-      tx.executeSql(
-        'CREATE TABLE IF NOT EXISTS pinned_leaderboards (id INTEGER PRIMARY KEY AUTOINCREMENT, leaderboard_name TEXT)',
-        [],
-        () => {
-          return;
-        },
-        error => {
-          console.error('Error creating table:', error);
-        },
-      );
-    });
-
-    // Insert data into the table
-    db.transaction(tx => {
-      tx.executeSql(
-        'INSERT INTO pinned_leaderboards (leaderboard_name) VALUES (?)',
-        [leaderboardName],
-        () => {
-          return;
-        },
-        error => {
-          console.error('Error inserting data:', error);
-        },
-      );
-    });
+    pinnedLeaderboardsRef.set(true);
 
     navigation.navigate('home', {leaderboard: leaderboardName});
   };

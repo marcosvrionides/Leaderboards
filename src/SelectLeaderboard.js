@@ -54,7 +54,9 @@ const SelectLeaderboard = ({navigation}) => {
       leaderboardsRef.once('value', snapshot => {
         const leaderboardArray = [];
         snapshot.forEach(childSnapshot => {
-          leaderboardArray.push(childSnapshot.key);
+          if (childSnapshot.key !== 'users') {
+            leaderboardArray.push(childSnapshot.key);
+          }
         });
 
         // Sort leaderboards
@@ -91,7 +93,6 @@ const SelectLeaderboard = ({navigation}) => {
     leaderboardPasswordRef.on('value', snapshot => {
       snapshot.forEach(childSnapshot => {
         if (childSnapshot.val() !== '') {
-          console.log('locked');
           setShowPasswordInput(true);
           setPasswordInput('');
           setSelectedLeaderboard({

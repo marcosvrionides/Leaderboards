@@ -5,7 +5,6 @@ import {
   TouchableOpacity,
   View,
   BackHandler,
-  Alert,
 } from 'react-native';
 import React, {useEffect, useState} from 'react';
 import colours from './Colours';
@@ -16,7 +15,6 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 import {useFocusEffect} from '@react-navigation/native';
 import Players from './Players';
 import database from '@react-native-firebase/database';
-import {BlurView} from '@react-native-community/blur';
 
 const Home = ({navigation, route}) => {
   const leaderboard = route.params.leaderboard;
@@ -65,7 +63,7 @@ const Home = ({navigation, route}) => {
           top: 0,
           width: '100%',
           zIndex: 1,
-          backgroundColor: 'rgba(255, 255, 255, 0.9)',
+          backgroundColor: colours.translucent_background,
         }}>
         <View style={styles.titleContainer}>
           <TouchableOpacity

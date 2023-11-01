@@ -16,8 +16,8 @@ import {useFocusEffect} from '@react-navigation/native';
 import colours from './Colours';
 import database from '@react-native-firebase/database';
 import AntDesign from 'react-native-vector-icons/AntDesign';
-import SQLiteStorage from 'react-native-sqlite-storage';
 import LoadingScreen from './LoadingScreen';
+import auth from '@react-native-firebase/auth';
 
 const SelectLeaderboard = ({navigation}) => {
   const [leaderboards, setLeaderboards] = useState([]);
@@ -33,52 +33,18 @@ const SelectLeaderboard = ({navigation}) => {
 
   const searchInputRef = useRef(null);
 
-  // Open or create the database
-  const db = SQLiteStorage.openDatabase(
-    {
-      name: 'myDatabase.db',
-      location: 'default',
-    },
-    () => {
-      return;
-    },
-    error => {
-      console.error('Error opening database:', error);
-    },
-  );
-
   useEffect(() => {
-    // Read data from the database
-    db.transaction(tx => {
-      setPinnedLeaderboards([]);
-      tx.executeSql(
-        'SELECT * FROM pinned_leaderboards',
-        [],
-        (tx, results) => {
-          // The results variable contains the query result
-          const len = results.rows.length;
-          if (len > 0) {
-            // Loop through the results
-            for (let i = 0; i < len; i++) {
-              const row = results.rows.item(i);
-              // Access the data in each row
-              const leaderboard_name = row.leaderboard_name;
-
-              // Do something with the retrieved data
-              setPinnedLeaderboards(prevState => [
-                ...prevState,
-                leaderboard_name,
-              ]);
-            }
-          } else {
-            console.log('No data found in the table.');
-          }
-        },
-        error => {
-          console.error('Error reading data from the table:', error);
-        },
-      );
+    // read pins from firebase
+    const usersPinsRef = database().ref(
+      '/users/' + auth().currentUser.uid + '/pins/',
+    );
+    let tempPins = [];
+    usersPinsRef.on('value', snapshot => {
+      snapshot.forEach(childSnapshot => {
+        tempPins.push(childSnapshot.key);
+      });
     });
+    setPinnedLeaderboards(tempPins);
   }, [refresh]);
 
   useFocusEffect(
@@ -156,49 +122,13 @@ const SelectLeaderboard = ({navigation}) => {
   };
 
   const handlePinLeaderboard = () => {
-    // Create a table
-    db.transaction(tx => {
-      tx.executeSql(
-        'CREATE TABLE IF NOT EXISTS pinned_leaderboards (id INTEGER PRIMARY KEY AUTOINCREMENT, leaderboard_name TEXT)',
-        [],
-        () => {
-          return;
-        },
-        error => {
-          console.error('Error creating table:', error);
-        },
-      );
-    });
-
+    const pinnedLeaderboardsRef = database().ref(
+      '/users/' + auth().currentUser.uid + '/pins/' + selectedLeaderboard,
+    );
     if (pinnedLeaderboards.includes(selectedLeaderboard)) {
-      // Remove leaderboards from the table
-      db.transaction(tx => {
-        tx.executeSql(
-          'DELETE FROM pinned_leaderboards WHERE leaderboard_name = ?',
-          [selectedLeaderboard],
-          () => {
-            unSubscribeToTopic();
-          },
-          error => {
-            console.error('Error removing leaderboard:', error);
-          },
-        );
-      });
-    } else {
-      // Insert data into the table
-      db.transaction(tx => {
-        tx.executeSql(
-          'INSERT INTO pinned_leaderboards (leaderboard_name) VALUES (?)',
-          [selectedLeaderboard],
-          () => {
-            ToastAndroid.show('Added to favourites.', ToastAndroid.SHORT);
-            subscribeToTopic();
-          },
-          error => {
-            console.error('Error inserting data:', error);
-          },
-        );
-      });
+      pinnedLeaderboardsRef.remove();
+    } else if (!pinnedLeaderboards.includes(selectedLeaderboard)) {
+      pinnedLeaderboardsRef.set(true);
     }
     setSelectedLeaderboard('');
     setShowPinPopup(false);
@@ -207,7 +137,6 @@ const SelectLeaderboard = ({navigation}) => {
 
   useEffect(() => {
     const handleNavigateBack = () => {
-      // navigation.navigate('selectLeaderboard');
       Alert.alert('Hold on!', 'Are you sure you want to exit?', [
         {
           text: 'Cancel',

@@ -365,7 +365,7 @@ const AddGame = ({navigation, route}) => {
                   filterPlayerNames(2, text.toLocaleLowerCase());
                 }}
                 onSubmitEditing={() => {
-                  handleSwitchInputRef(3);
+                  handleSwitchInputRef(2);
                   setFilteredPlayer2Names([]);
                 }}
                 maxLength={30}

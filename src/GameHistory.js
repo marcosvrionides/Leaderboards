@@ -46,7 +46,13 @@ const GameHistory = ({leaderboardName, gameHistoryData, filterName}) => {
           })
           .slice(0, renderedData)
           .map((item, index) => {
-            return <GameCard gameData={item} key={index} />;
+            return (
+              <GameCard
+                gameData={item}
+                leaderboardName={leaderboardName}
+                key={index}
+              />
+            );
           })
       )}
       {displayedData.length > 3 && (

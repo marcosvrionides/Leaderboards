@@ -16,7 +16,6 @@ import {ToastAndroid, FlatList} from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import * as MediaPicker from 'react-native-image-picker';
 import storage from '@react-native-firebase/storage';
-import SQLiteStorage from 'react-native-sqlite-storage';
 import InAppReview from 'react-native-in-app-review';
 import auth from '@react-native-firebase/auth';
 
@@ -115,53 +114,12 @@ const AddGame = ({navigation, route}) => {
       note: gameNote,
       media: gameMedia,
       timestamp: database.ServerValue.TIMESTAMP,
+      addedBy: auth().currentUser.uid,
     });
 
     if (gameMedia !== undefined) {
       uploadMedia(newGameRef.key);
     }
-
-    // Open or create the database
-    const db = SQLiteStorage.openDatabase(
-      {
-        name: 'myDatabase.db',
-        location: 'default',
-      },
-      () => {
-        return;
-      },
-      error => {
-        console.error('Error opening database:', error);
-      },
-    );
-
-    // Create a table
-    db.transaction(tx => {
-      tx.executeSql(
-        'CREATE TABLE IF NOT EXISTS pinned_leaderboards (id INTEGER PRIMARY KEY AUTOINCREMENT, leaderboard_name TEXT)',
-        [],
-        () => {
-          return;
-        },
-        error => {
-          console.error('Error creating table:', error);
-        },
-      );
-    });
-
-    // Insert data into the table
-    db.transaction(tx => {
-      tx.executeSql(
-        'INSERT INTO pinned_leaderboards (leaderboard_name) VALUES (?)',
-        [leaderboard],
-        () => {
-          return;
-        },
-        error => {
-          console.error('Error inserting data:', error);
-        },
-      );
-    });
 
     const pinnedLeaderboardsRef = database().ref(
       '/users/' + auth().currentUser.uid + '/pins/' + leaderboard,

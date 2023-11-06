@@ -76,7 +76,7 @@ const styles = StyleSheet.create({
     backgroundColor: colours.background,
     elevation: 7,
     padding: 10,
-    marginVertical: 10,
+    marginTop: 5,
   },
   title: {
     fontSize: 28,

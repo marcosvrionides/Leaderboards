@@ -15,7 +15,6 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 import {useFocusEffect} from '@react-navigation/native';
 import Players from './Players';
 import database from '@react-native-firebase/database';
-import LoadingScreen from './LoadingScreen';
 import colors from './Colours';
 
 const Home = ({navigation, route}) => {

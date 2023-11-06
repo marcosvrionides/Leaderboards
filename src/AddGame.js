@@ -37,9 +37,17 @@ const AddGame = ({navigation, route}) => {
   const player1WinsInputRef = useRef(null);
   const player2WinsInputRef = useRef(null);
   const noteInputRef = useRef(null);
+  const passwordInputRef = useRef(null);
+
+  const [leaderboardPasswordInput, setLeaderboardPasswordInput] = useState('');
+  const [leaderboardPassword, setLeaderboardPassword] = useState('');
+  const [wrongPassword, setWrongPassword] = useState(false);
 
   useEffect(() => {
     const leaderboard_ref = database().ref(leaderboard);
+    const leaderboard_password_ref = database().ref(
+      leaderboard + '/' + 'password',
+    );
 
     leaderboard_ref.on('value', snapshot => {
       const temp_playerNames = [];
@@ -64,6 +72,12 @@ const AddGame = ({navigation, route}) => {
       });
 
       setPlayerNames(temp_playerNames);
+    });
+
+    leaderboard_password_ref.on('value', snapshot => {
+      snapshot.forEach(childSnapshot => {
+        setLeaderboardPassword(childSnapshot.val());
+      });
     });
   }, []);
 
@@ -103,6 +117,11 @@ const AddGame = ({navigation, route}) => {
       )
     ) {
       ToastAndroid.show('Invalid input.', ToastAndroid.SHORT);
+      return;
+    }
+    if (leaderboardPasswordInput !== leaderboardPassword) {
+      ToastAndroid.show('Wrong password.', ToastAndroid.SHORT);
+      setWrongPassword(true);
       return;
     }
     const game_history_ref = database().ref('/' + leaderboard);
@@ -197,6 +216,9 @@ const AddGame = ({navigation, route}) => {
         break;
       case 4:
         noteInputRef.current.focus();
+        break;
+      case 5:
+        passwordInputRef.current.focus();
         break;
     }
   };
@@ -373,6 +395,7 @@ const AddGame = ({navigation, route}) => {
                 value={gameNote}
                 onChangeText={string => setGameNote(string)}
                 maxLength={300}
+                onSubmitEditing={() => handleSwitchInputRef(5)}
               />
               <TouchableOpacity
                 style={styles.mediaInput}
@@ -389,6 +412,19 @@ const AddGame = ({navigation, route}) => {
                 </TouchableOpacity>
                 <Image style={styles.mediaPreview} src={gameMedia} />
               </View>
+            )}
+            {leaderboardPassword && (
+              <TextInput
+                ref={passwordInputRef}
+                style={[
+                  styles.passwordInput,
+                  wrongPassword && {borderWidth: 2, borderColor: 'red'},
+                ]}
+                placeholder="Password"
+                placeholderTextColor={colours.light_text}
+                value={leaderboardPasswordInput}
+                onChangeText={string => setLeaderboardPasswordInput(string)}
+              />
             )}
           </View>
         </View>
@@ -517,5 +553,13 @@ const styles = StyleSheet.create({
     zIndex: 1,
     top: 10,
     left: 0,
+  },
+  passwordInput: {
+    color: colours.text,
+    backgroundColor: colours.primary,
+    borderRadius: 5,
+    width: '100%',
+    marginTop: 20,
+    textAlign: 'center',
   },
 });

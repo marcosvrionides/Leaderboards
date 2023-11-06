@@ -24,9 +24,7 @@ const SelectLeaderboard = ({navigation}) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [filteredLeaderboards, setFilteredLeaderboards] = useState([]);
 
-  const [showPasswordInput, setShowPasswordInput] = useState(false);
   const [selectedLeaderboard, setSelectedLeaderboard] = useState({});
-  const [passwordInput, setPasswordInput] = useState('');
 
   const [pinnedLeaderboards, setPinnedLeaderboards] = useState([]);
   const [refresh, setRefresh] = useState(false);
@@ -49,7 +47,6 @@ const SelectLeaderboard = ({navigation}) => {
 
   useFocusEffect(
     React.useCallback(() => {
-      setShowPasswordInput(false);
       const leaderboardsRef = database().ref('/');
       leaderboardsRef.once('value', snapshot => {
         const leaderboardArray = [];
@@ -84,36 +81,6 @@ const SelectLeaderboard = ({navigation}) => {
       leaderboard.toLowerCase().includes(text.toLowerCase()),
     );
     setFilteredLeaderboards(filtered);
-  };
-
-  const handleOpenLeaderboard = leaderboard => {
-    const leaderboardPasswordRef = database().ref(
-      '/' + leaderboard + '/password',
-    );
-    leaderboardPasswordRef.on('value', snapshot => {
-      snapshot.forEach(childSnapshot => {
-        if (childSnapshot.val() !== '') {
-          setShowPasswordInput(true);
-          setPasswordInput('');
-          setSelectedLeaderboard({
-            leaderboard: leaderboard,
-            password: childSnapshot.val(),
-          });
-        } else {
-          navigation.navigate('home', {leaderboard: leaderboard});
-        }
-      });
-    });
-  };
-
-  const handleCheckPassword = () => {
-    if (passwordInput === selectedLeaderboard.password) {
-      navigation.navigate('home', {
-        leaderboard: selectedLeaderboard.leaderboard,
-      });
-    } else {
-      ToastAndroid.show('Wrong password.', ToastAndroid.SHORT);
-    }
   };
 
   const [showPinPopup, setShowPinPopup] = useState(false);
@@ -188,50 +155,6 @@ const SelectLeaderboard = ({navigation}) => {
             </View>
           </View>
         </Modal>
-        {showPasswordInput && (
-          <View style={styles.passwordFormContainer}>
-            <TouchableOpacity
-              onPress={() => {
-                setShowPasswordInput(false);
-                setPasswordInput('');
-              }}
-              style={styles.closePasswordFormContainer}>
-              <View
-                style={[styles.closeLine, {transform: [{rotate: '45deg'}]}]}
-              />
-              <View
-                style={[styles.closeLine, {transform: [{rotate: '-45deg'}]}]}
-              />
-            </TouchableOpacity>
-            <View style={styles.passwordInputContainer}>
-              <Text style={{color: colours.text, fontSize: 20}}>
-                Enter password for{' '}
-                <Text style={styles.leaderboardName}>
-                  {selectedLeaderboard.leaderboard}
-                </Text>
-              </Text>
-              <View style={styles.inputContainer}>
-                <TextInput
-                  style={styles.passwordInput}
-                  placeholder="password"
-                  placeholderTextColor={colours.light_text}
-                  onChangeText={text => setPasswordInput(text)}
-                  value={passwordInput}
-                />
-                <TouchableOpacity
-                  onPress={() => handleCheckPassword()}
-                  style={styles.enterPasswordButtonContainer}>
-                  <AntDesign
-                    style={styles.enterPasswordButtonText}
-                    name={'arrowright'}
-                    color={colours.text}
-                    size={18}
-                  />
-                </TouchableOpacity>
-              </View>
-            </View>
-          </View>
-        )}
         <View style={styles.leaderboardsContainer}>
           <TouchableWithoutFeedback
             onPress={() => searchInputRef.current.focus()}>
@@ -261,7 +184,9 @@ const SelectLeaderboard = ({navigation}) => {
               <View key={index}>
                 <TouchableOpacity
                   style={styles.game}
-                  onPress={() => handleOpenLeaderboard(leaderboard)}
+                  onPress={() =>
+                    navigation.navigate('home', {leaderboard: leaderboard})
+                  }
                   onLongPress={() => handleLongPress(leaderboard)}>
                   <Text style={styles.gameText}>
                     {pinnedLeaderboards.includes(leaderboard) ? '📌 ' : ''}
@@ -359,30 +284,6 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
     marginTop: 10,
   },
-  passwordFormContainer: {
-    backgroundColor: colours.background,
-    zIndex: 1,
-    position: 'absolute',
-    bottom: 10,
-    width: '100%',
-    height: '100%',
-    borderWidth: 2,
-    paddingVertical: 10,
-    borderRadius: 10,
-  },
-  passwordInputContainer: {
-    position: 'absolute',
-    top: '30%',
-    width: '100%',
-    alignItems: 'center',
-    display: 'flex',
-    gap: 10,
-  },
-  passwordInput: {
-    flex: 0.95,
-    color: colours.text,
-    fontSize: 15,
-  },
   inputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -390,36 +291,10 @@ const styles = StyleSheet.create({
     borderColor: colours.text,
     borderRadius: 5,
   },
-  enterPasswordButtonContainer: {
-    backgroundColor: colours.primary,
-    justifyContent: 'center',
-    marginRight: 5,
-    height: 40,
-    width: 40,
-    borderRadius: 50,
-    elevation: 7,
-  },
-  enterPasswordButtonText: {
-    textAlign: 'center',
-  },
   leaderboardName: {
     fontStyle: 'italic',
     fontWeight: 'bold',
     color: colours.accent,
-  },
-  closePasswordFormContainer: {
-    width: 50,
-    height: 50,
-    justifyContent: 'center',
-    position: 'absolute',
-    bottom: 50,
-    left: '50%',
-    transform: [{translateX: -25}],
-  },
-  closeLine: {
-    height: 2,
-    width: '100%',
-    backgroundColor: colours.text,
   },
   pinPopup: {
     backgroundColor: colours.lighter_background,

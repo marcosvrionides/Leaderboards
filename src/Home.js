@@ -15,6 +15,8 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 import {useFocusEffect} from '@react-navigation/native';
 import Players from './Players';
 import database from '@react-native-firebase/database';
+import LoadingScreen from './LoadingScreen';
+import colors from './Colours';
 
 const Home = ({navigation, route}) => {
   const leaderboard = route.params.leaderboard;
@@ -22,6 +24,7 @@ const Home = ({navigation, route}) => {
   const [currentScreen, setCurrentScreen] = useState('home');
 
   const [gameHistoryData, setGameHistoryData] = useState([]);
+  const [noData, setNoData] = useState();
 
   useFocusEffect(
     React.useCallback(() => {
@@ -36,6 +39,7 @@ const Home = ({navigation, route}) => {
             data.push(gameData);
           }
         });
+        setNoData(data.length === 0);
         setGameHistoryData(data);
       });
     }, []),
@@ -87,52 +91,67 @@ const Home = ({navigation, route}) => {
             <Text style={styles.addGameButtonText}>+</Text>
           </TouchableOpacity>
         </View>
-        <View style={styles.navigationBar}>
+
+        {!noData && (
+          <View style={styles.navigationBar}>
+            <TouchableOpacity
+              style={[
+                styles.navigationBarButton,
+                currentScreen === 'home' && {borderBottomWidth: 2},
+              ]}
+              onPress={() => setCurrentScreen('home')}>
+              <Text style={styles.navigationBarButtonText}>Home</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[
+                styles.navigationBarButton,
+                currentScreen === 'players' && {borderBottomWidth: 2},
+              ]}
+              onPress={() => setCurrentScreen('players')}>
+              <Text style={styles.navigationBarButtonText}>Players</Text>
+            </TouchableOpacity>
+          </View>
+        )}
+      </View>
+      {noData ? (
+        <View style={styles.addFirstGameContainer}>
           <TouchableOpacity
-            style={[
-              styles.navigationBarButton,
-              currentScreen === 'home' && {borderBottomWidth: 2},
-            ]}
-            onPress={() => setCurrentScreen('home')}>
-            <Text style={styles.navigationBarButtonText}>Home</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[
-              styles.navigationBarButton,
-              currentScreen === 'players' && {borderBottomWidth: 2},
-            ]}
-            onPress={() => setCurrentScreen('players')}>
-            <Text style={styles.navigationBarButtonText}>Players</Text>
+            style={styles.addFirstGameButton}
+            onPress={() =>
+              navigation.navigate('addGame', {leaderboard: leaderboard})
+            }>
+            <Text style={styles.addFirstGameText}>Add First Game</Text>
           </TouchableOpacity>
         </View>
-      </View>
-      <View>
-        {currentScreen === 'home' ? (
-          <ScrollView>
-            <View style={{height: 90}} />
-            <SetsLeaderboard
-              leaderboardName={leaderboard}
-              gameHistoryData={gameHistoryData}
-            />
-            <Leaderboard
-              leaderboardName={leaderboard}
-              gameHistoryData={gameHistoryData}
-            />
-            <GameHistory
-              leaderboardName={leaderboard}
-              gameHistoryData={gameHistoryData}
-            />
-          </ScrollView>
-        ) : currentScreen === 'players' ? (
-          <ScrollView>
-            <View style={{height: 90}} />
-            <Players
-              leaderboardName={leaderboard}
-              gameHistoryData={gameHistoryData}
-            />
-          </ScrollView>
-        ) : null}
-      </View>
+      ) : (
+        <View>
+          {currentScreen === 'home' ? (
+            <ScrollView>
+              <View style={{height: 90}} />
+              <SetsLeaderboard
+                leaderboardName={leaderboard}
+                gameHistoryData={gameHistoryData}
+              />
+              <Leaderboard
+                leaderboardName={leaderboard}
+                gameHistoryData={gameHistoryData}
+              />
+              <GameHistory
+                leaderboardName={leaderboard}
+                gameHistoryData={gameHistoryData}
+              />
+            </ScrollView>
+          ) : currentScreen === 'players' ? (
+            <ScrollView>
+              <View style={{height: 90}} />
+              <Players
+                leaderboardName={leaderboard}
+                gameHistoryData={gameHistoryData}
+              />
+            </ScrollView>
+          ) : null}
+        </View>
+      )}
     </View>
   );
 };
@@ -193,5 +212,20 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     color: colours.text,
     fontSize: 15,
+  },
+  addFirstGameContainer: {
+    height: '100%',
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  addFirstGameButton: {
+    backgroundColor: colors.background,
+    padding: 20,
+    borderRadius: 10,
+  },
+  addFirstGameText: {
+    color: colors.text,
+    fontSize: 18,
   },
 });

@@ -43,8 +43,8 @@ const SelectLeaderboard = ({navigation}) => {
       snapshot.forEach(childSnapshot => {
         tempPins.push(childSnapshot.key);
       });
+      setPinnedLeaderboards(tempPins);
     });
-    setPinnedLeaderboards(tempPins);
   }, [refresh]);
 
   useFocusEffect(

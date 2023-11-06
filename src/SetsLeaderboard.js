@@ -87,7 +87,7 @@ const SetsLeaderboard = ({leaderboardName, gameHistoryData}) => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Sets</Text>
+      <Text style={styles.title}>Games</Text>
       <View style={styles.tableHeaderRow}>
         <Text
           style={[

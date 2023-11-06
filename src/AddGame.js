@@ -453,7 +453,6 @@ const styles = StyleSheet.create({
     width: '100%',
     position: 'absolute',
     top: 0,
-    backgroundColor: 'rgba(255, 255, 255, 0.9)',
   },
   title: {
     fontSize: 20,

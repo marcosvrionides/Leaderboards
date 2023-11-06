@@ -64,7 +64,7 @@ const Leaderboard = ({leaderboardName, gameHistoryData}) => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Individual Games</Text>
+      <Text style={styles.title}>Total Points</Text>
       <View style={styles.tableHeaderRow}>
         <Text
           style={[

@@ -7,19 +7,19 @@ import {
   ToastAndroid,
   Switch,
   BackHandler,
+  Alert,
 } from 'react-native';
 import React, {useEffect, useState} from 'react';
 import colours from './Colours';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import database from '@react-native-firebase/database';
-import SQLiteStorage from 'react-native-sqlite-storage';
 import auth from '@react-native-firebase/auth';
 
 const NewLeaderboardForm = ({navigation}) => {
   const [leaderboardName, setLeaderboardName] = useState('');
   const [leaderboardPassword, setLeaderboardPassword] = useState('');
   const [nameInUse, setNameInUse] = useState(false);
-  const [lockLeaderboard, setLockLeaderboard] = useState(false);
+  const [lockLeaderboard, setLockLeaderboard] = useState(true);
 
   const handleChangeLeaderboardName = text => {
     setLeaderboardName(text);
@@ -28,7 +28,8 @@ const NewLeaderboardForm = ({navigation}) => {
       if (
         snapshot.exists() ||
         text.trim() === 'password' ||
-        text.trim() === 'users'
+        text.trim() === 'users' ||
+        text.trim() === 'errors'
       ) {
         setNameInUse(true);
       } else {
@@ -71,6 +72,22 @@ const NewLeaderboardForm = ({navigation}) => {
     return () => backHandler.remove();
   }, []);
 
+  const handleTogglePassword = () => {
+    if (lockLeaderboard) {
+      Alert.alert(
+        'Warning!',
+        'This leaderboard will be public and anyone on the app will be able to use it.',
+        [
+          {
+            text: 'Dismiss',
+          },
+        ],
+        {cancelable: true},
+      );
+    }
+    setLockLeaderboard(!lockLeaderboard);
+  };
+
   return (
     <View style={styles.container}>
       <View style={styles.titleContainer}>
@@ -100,7 +117,9 @@ const NewLeaderboardForm = ({navigation}) => {
         <View style={styles.lockLeaderboardContainer}>
           <Text style={styles.lockLeaderboardText}>Require Password?</Text>
           <Switch
-            onValueChange={() => setLockLeaderboard(!lockLeaderboard)}
+            onValueChange={() => {
+              handleTogglePassword();
+            }}
             value={lockLeaderboard}
             thumbColor={lockLeaderboard ? colours.primary : 'black'}
           />

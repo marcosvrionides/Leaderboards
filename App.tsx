@@ -1,5 +1,5 @@
 import React, {useEffect} from 'react';
-import {PermissionsAndroid, StyleSheet} from 'react-native';
+import {PermissionsAndroid, StyleSheet, View} from 'react-native';
 import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import Home from './src/Home';
@@ -10,6 +10,8 @@ import NewLeaderboardForm from './src/NewLeaderboardForm';
 import messaging from '@react-native-firebase/messaging';
 import colors from './src/Colours';
 import auth from '@react-native-firebase/auth';
+import database from '@react-native-firebase/database';
+import LoadingScreen from './src/LoadingScreen';
 
 const App = () => {
   PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS);
@@ -36,6 +38,11 @@ const App = () => {
   useEffect(() => {
     handleGuestLogin();
   }, []);
+
+  if (auth().currentUser === null) {
+    // Wait for user authentication
+    return <LoadingScreen />;
+  }
 
   return (
     <>

@@ -1,4 +1,4 @@
-import React, {useEffect} from 'react';
+import React, {useEffect, useState} from 'react';
 import {PermissionsAndroid, StyleSheet, View} from 'react-native';
 import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
@@ -10,11 +10,12 @@ import NewLeaderboardForm from './src/NewLeaderboardForm';
 import messaging from '@react-native-firebase/messaging';
 import colors from './src/Colours';
 import auth from '@react-native-firebase/auth';
-import database from '@react-native-firebase/database';
 import LoadingScreen from './src/LoadingScreen';
 
 const App = () => {
   PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS);
+
+  const [isLoading, setIsLoading] = useState(true);
 
   // Register background handler
   messaging().setBackgroundMessageHandler(async remoteMessage => {
@@ -30,6 +31,7 @@ const App = () => {
   const handleGuestLogin = async () => {
     auth()
       .signInAnonymously()
+      .then(() => setIsLoading(false))
       .catch(error => {
         console.error(error);
       });
@@ -39,12 +41,9 @@ const App = () => {
     handleGuestLogin();
   }, []);
 
-  if (auth().currentUser === null) {
-    // Wait for user authentication
-    return <LoadingScreen />;
-  }
-
-  return (
+  return isLoading ? (
+    <LoadingScreen />
+  ) : (
     <>
       <GAMBannerAd
         unitId={'ca-app-pub-7497957931538271/9931339721'}

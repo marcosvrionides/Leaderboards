@@ -14,6 +14,7 @@ import colours from './Colours';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import database from '@react-native-firebase/database';
 import auth from '@react-native-firebase/auth';
+import messaging from '@react-native-firebase/messaging';
 
 const NewLeaderboardForm = ({navigation}) => {
   const [leaderboardName, setLeaderboardName] = useState('');
@@ -22,6 +23,14 @@ const NewLeaderboardForm = ({navigation}) => {
   const [lockLeaderboard, setLockLeaderboard] = useState(true);
 
   const handleChangeLeaderboardName = text => {
+    if (text.includes(' ')) {
+      setNameInUse(true);
+      ToastAndroid.show(
+        'Leaderboard name cannot contain spaces.',
+        ToastAndroid.SHORT,
+      );
+      return;
+    }
     setLeaderboardName(text);
     const databaseRef = database().ref('/' + text);
     databaseRef.once('value', snapshot => {
@@ -32,6 +41,10 @@ const NewLeaderboardForm = ({navigation}) => {
         text.trim() === 'errors'
       ) {
         setNameInUse(true);
+        ToastAndroid.show(
+          'Leaderboard name already exists.',
+          ToastAndroid.SHORT,
+        );
       } else {
         setNameInUse(false);
       }
@@ -54,6 +67,10 @@ const NewLeaderboardForm = ({navigation}) => {
       '/users/' + auth().currentUser.uid + '/pins/' + leaderboardName,
     );
     pinnedLeaderboardsRef.set(true);
+
+    messaging()
+      .subscribeToTopic(leaderboardName)
+      .then(() => console.log('subscribed to topic "' + leaderboardName + '"'));
 
     navigation.navigate('home', {leaderboard: leaderboardName});
   };

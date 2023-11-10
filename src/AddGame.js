@@ -18,6 +18,7 @@ import * as MediaPicker from 'react-native-image-picker';
 import storage from '@react-native-firebase/storage';
 import InAppReview from 'react-native-in-app-review';
 import auth from '@react-native-firebase/auth';
+import messaging from '@react-native-firebase/messaging';
 
 const AddGame = ({navigation, route}) => {
   const leaderboard = route.params.leaderboard;
@@ -144,6 +145,10 @@ const AddGame = ({navigation, route}) => {
       '/users/' + auth().currentUser.uid + '/pins/' + leaderboard,
     );
     pinnedLeaderboardsRef.set(true);
+
+    messaging()
+      .subscribeToTopic(leaderboard)
+      .then(() => console.log('subscribed to topic "' + leaderboard + '"'));
 
     ToastAndroid.show('Game Saved.', ToastAndroid.SHORT);
 

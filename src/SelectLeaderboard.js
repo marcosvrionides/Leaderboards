@@ -6,7 +6,6 @@ import {
   TouchableOpacity,
   TouchableWithoutFeedback,
   View,
-  ToastAndroid,
   Modal,
   Alert,
   BackHandler,
@@ -18,6 +17,7 @@ import database from '@react-native-firebase/database';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import LoadingScreen from './LoadingScreen';
 import auth from '@react-native-firebase/auth';
+import messaging from '@react-native-firebase/messaging';
 
 const SelectLeaderboard = ({navigation}) => {
   const [leaderboards, setLeaderboards] = useState([]);
@@ -95,8 +95,18 @@ const SelectLeaderboard = ({navigation}) => {
     );
     if (pinnedLeaderboards.includes(selectedLeaderboard)) {
       pinnedLeaderboardsRef.remove();
+      messaging()
+        .unsubscribeFromTopic(selectedLeaderboard)
+        .then(() =>
+          console.log('unsubscribed from topic "' + selectedLeaderboard + '"'),
+        );
     } else if (!pinnedLeaderboards.includes(selectedLeaderboard)) {
       pinnedLeaderboardsRef.set(true);
+      messaging()
+        .subscribeToTopic(selectedLeaderboard)
+        .then(() =>
+          console.log('subscribed to topic "' + selectedLeaderboard + '"'),
+        );
     }
     setSelectedLeaderboard('');
     setShowPinPopup(false);

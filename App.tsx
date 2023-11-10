@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {PermissionsAndroid, StyleSheet, View} from 'react-native';
+import {Alert, PermissionsAndroid, StyleSheet} from 'react-native';
 import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import Home from './src/Home';
@@ -11,6 +11,7 @@ import messaging from '@react-native-firebase/messaging';
 import colors from './src/Colours';
 import auth from '@react-native-firebase/auth';
 import LoadingScreen from './src/LoadingScreen';
+import notifee from '@notifee/react-native';
 
 const App = () => {
   PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS);
@@ -19,8 +20,37 @@ const App = () => {
 
   // Register background handler
   messaging().setBackgroundMessageHandler(async remoteMessage => {
-    console.log(remoteMessage);
+    console.log('Message handled in the background!', remoteMessage);
+    const {data} = remoteMessage;
+
+    // Create a channel (required for Android)
+    const channelId = await notifee.createChannel({
+      id: 'default',
+      name: 'Default Channel',
+    });
+
+    // Display a notification
+    await notifee.displayNotification({
+      title: data.leaderboard + ': ' + data.player_1 + ' vs ' + data.player_2,
+      body: data.player_1_wins + ' - ' + data.player_1_wins,
+      android: {
+        channelId,
+        // pressAction is needed if you want the notification to open the app when pressed
+        pressAction: {
+          id: 'default',
+        },
+      },
+    });
   });
+
+  // // Foreground message handler
+  // useEffect(() => {
+  //   const unsubscribe = messaging().onMessage(async remoteMessage => {
+  //     Alert.alert('A new FCM message arrived!', JSON.stringify(remoteMessage));
+  //   });
+
+  //   return unsubscribe;
+  // }, []);
 
   const Stack = createNativeStackNavigator();
 

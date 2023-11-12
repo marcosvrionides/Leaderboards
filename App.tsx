@@ -11,7 +11,7 @@ import messaging from '@react-native-firebase/messaging';
 import colors from './src/Colours';
 import auth from '@react-native-firebase/auth';
 import LoadingScreen from './src/LoadingScreen';
-import notifee from '@notifee/react-native';
+import notifee, {AndroidImportance} from '@notifee/react-native';
 
 const App = () => {
   PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS);
@@ -23,16 +23,18 @@ const App = () => {
     console.log('Message handled in the background!', remoteMessage);
     const {data} = remoteMessage;
 
-    // Create a channel (required for Android)
+    // Create a channel
     const channelId = await notifee.createChannel({
       id: 'default',
       name: 'Default Channel',
+      importance: AndroidImportance.HIGH,
+      vibration: true,
     });
 
     // Display a notification
     await notifee.displayNotification({
-      title: data.leaderboard + ': ' + data.player_1 + ' vs ' + data.player_2,
-      body: data.player_1_wins + ' - ' + data.player_1_wins,
+      title: `${data.player_1} (${data.player_1_wins}) - ${data.player_2} (${data.player_2_wins})`,
+      subtitle: data.leaderboard,
       android: {
         channelId,
         // pressAction is needed if you want the notification to open the app when pressed
@@ -43,14 +45,36 @@ const App = () => {
     });
   });
 
-  // // Foreground message handler
-  // useEffect(() => {
-  //   const unsubscribe = messaging().onMessage(async remoteMessage => {
-  //     Alert.alert('A new FCM message arrived!', JSON.stringify(remoteMessage));
-  //   });
+  // Foreground message handler
+  useEffect(() => {
+    const unsubscribe = messaging().onMessage(async remoteMessage => {
+      console.log('Message handled in the foreground!', remoteMessage);
+      const {data} = remoteMessage;
 
-  //   return unsubscribe;
-  // }, []);
+      // Create a channel
+      const channelId = await notifee.createChannel({
+        id: 'default',
+        name: 'Default Channel',
+        importance: AndroidImportance.HIGH,
+        vibration: true,
+      });
+
+      // Display a notification
+      await notifee.displayNotification({
+        title: `${data.player_1} (${data.player_1_wins}) - ${data.player_2} (${data.player_2_wins})`,
+        subtitle: data.leaderboard,
+        android: {
+          channelId,
+          // pressAction is needed if you want the notification to open the app when pressed
+          pressAction: {
+            id: 'default',
+          },
+        },
+      });
+    });
+
+    return unsubscribe;
+  }, []);
 
   const Stack = createNativeStackNavigator();
 

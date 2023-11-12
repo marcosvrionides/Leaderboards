@@ -32,6 +32,7 @@ exports.onDataAdded = onValueCreated(
         player_2: data.player_2_name,
         player_1_wins: data.player_1_games_won,
         player_2_wins: data.player_2_games_won,
+        timestamp: data.timestamp.toString(),
         leaderboard: leaderboard,
       },
       topic: leaderboard,

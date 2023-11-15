@@ -9,6 +9,7 @@ import {
   Modal,
   Alert,
   BackHandler,
+  ScrollView,
 } from 'react-native';
 import React, {useRef, useState, useEffect} from 'react';
 import {useFocusEffect} from '@react-navigation/native';
@@ -56,21 +57,8 @@ const SelectLeaderboard = ({navigation}) => {
           }
         });
 
-        // Sort leaderboards
-        const sortedLeaderboards = leaderboardArray.sort((a, b) => {
-          const aIsPinned = pinnedLeaderboards.includes(a);
-          const bIsPinned = pinnedLeaderboards.includes(b);
-          if (aIsPinned && !bIsPinned) {
-            return -1;
-          }
-          if (!aIsPinned && bIsPinned) {
-            return 1;
-          }
-          return 0;
-        });
-
-        setLeaderboards(sortedLeaderboards);
-        setFilteredLeaderboards(sortedLeaderboards);
+        setLeaderboards(leaderboardArray);
+        setFilteredLeaderboards(leaderboardArray);
       });
     }, [pinnedLeaderboards]),
   );
@@ -139,88 +127,126 @@ const SelectLeaderboard = ({navigation}) => {
       onPress={() => {
         Keyboard.dismiss();
       }}>
-      <View style={styles.container}>
-        <Modal
-          animationType="slide"
-          transparent={true}
-          visible={showPinPopup}
-          onRequestClose={() => setShowPinPopup(!showPinPopup)}>
-          <View style={styles.pinPopup}>
-            <Text style={styles.pinPopupText}>
-              {pinnedLeaderboards.includes(selectedLeaderboard)
-                ? 'Remove pin?'
-                : 'Pin ' + selectedLeaderboard + '?'}
-            </Text>
-            <View style={styles.pinButtonsContainer}>
-              <TouchableOpacity
-                style={styles.pinButtons}
-                onPress={() => handlePinLeaderboard()}>
-                <Text style={styles.pinButtonsText}>Yes</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={styles.pinButtons}
-                onPress={() => setShowPinPopup(false)}>
-                <Text style={styles.pinButtonsText}>Cancel</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-        </Modal>
-        <View style={styles.leaderboardsContainer}>
-          <TouchableWithoutFeedback
-            onPress={() => searchInputRef.current.focus()}>
-            <View style={styles.searchBar}>
-              <AntDesign
-                name={'search1'}
-                color={colours.light_text}
-                size={18}
-              />
-              <TextInput
-                ref={searchInputRef}
-                placeholder={'Search...'}
-                placeholderTextColor={colours.light_text}
-                fontSize={18}
-                onChangeText={handleSearch}
-                value={searchQuery}
-              />
-            </View>
-          </TouchableWithoutFeedback>
-          <Text style={styles.selectLeaderboardText}>
-            Select a Leaderboard:
-          </Text>
-          {leaderboards.length === 0 ? (
-            <LoadingScreen />
-          ) : (
-            filteredLeaderboards.slice(0, 7).map((leaderboard, index) => (
-              <View key={index}>
+      <>
+        <ScrollView style={styles.container}>
+          <Modal
+            animationType="slide"
+            transparent={true}
+            visible={showPinPopup}
+            onRequestClose={() => setShowPinPopup(!showPinPopup)}>
+            <View style={styles.pinPopup}>
+              <Text style={styles.pinPopupText}>
+                {pinnedLeaderboards.includes(selectedLeaderboard)
+                  ? 'Remove pin?'
+                  : 'Pin ' + selectedLeaderboard + '?'}
+              </Text>
+              <View style={styles.pinButtonsContainer}>
                 <TouchableOpacity
-                  style={styles.game}
-                  onPress={() =>
-                    navigation.navigate('home', {leaderboard: leaderboard})
-                  }
-                  onLongPress={() => handleLongPress(leaderboard)}>
-                  <Text style={styles.gameText}>
-                    {pinnedLeaderboards.includes(leaderboard) ? '📌 ' : ''}
-                  </Text>
-                  <Text style={styles.gameText} numberOfLines={2}>
-                    {leaderboard}
-                  </Text>
+                  style={styles.pinButtons}
+                  onPress={() => handlePinLeaderboard()}>
+                  <Text style={styles.pinButtonsText}>Yes</Text>
                 </TouchableOpacity>
-                {index !== filteredLeaderboards.length - 1 && (
-                  <View style={styles.separator} />
-                )}
+                <TouchableOpacity
+                  style={styles.pinButtons}
+                  onPress={() => setShowPinPopup(false)}>
+                  <Text style={styles.pinButtonsText}>Cancel</Text>
+                </TouchableOpacity>
               </View>
-            ))
-          )}
-        </View>
-        <Text style={colours.light_text}>
-          (Long press to pin a leaderboard)
-        </Text>
+            </View>
+          </Modal>
+
+          <View style={styles.leaderboardsContainer}>
+            <Text style={styles.selectLeaderboardText}>My Leaderboards:</Text>
+            {pinnedLeaderboards.length === 0 ? (
+              <View>
+                <Text style={{color: colours.light_text, fontSize: 15}}>
+                  You don't have any leaderboards yet.{'\n\n'}
+                  Create a leaderboard using the plus button at the bottom right
+                  or select one of the pre-made leaderboards.
+                </Text>
+              </View>
+            ) : (
+              pinnedLeaderboards.map((leaderboard, index) => (
+                <View key={index}>
+                  <TouchableOpacity
+                    style={styles.game}
+                    onPress={() =>
+                      navigation.navigate('home', {leaderboard: leaderboard})
+                    }
+                    onLongPress={() => handleLongPress(leaderboard)}>
+                    <Text style={styles.gameText} numberOfLines={2}>
+                      {leaderboard}
+                    </Text>
+                  </TouchableOpacity>
+                  {index !== pinnedLeaderboards.length - 1 && (
+                    <View style={styles.separator} />
+                  )}
+                </View>
+              ))
+            )}
+          </View>
+
+          <View style={styles.leaderboardsContainer}>
+            <TouchableWithoutFeedback
+              onPress={() => searchInputRef.current.focus()}>
+              <View style={styles.searchBar}>
+                <AntDesign
+                  name={'search1'}
+                  color={colours.light_text}
+                  size={18}
+                />
+                <TextInput
+                  ref={searchInputRef}
+                  placeholder={'Search...'}
+                  placeholderTextColor={colours.light_text}
+                  fontSize={18}
+                  onChangeText={handleSearch}
+                  value={searchQuery}
+                />
+              </View>
+            </TouchableWithoutFeedback>
+            <Text style={styles.selectLeaderboardText}>All Leaderboards:</Text>
+            {leaderboards.length === 0 ? (
+              <LoadingScreen />
+            ) : (
+              filteredLeaderboards.slice(0, 5).map((leaderboard, index) => (
+                <View key={index}>
+                  <TouchableOpacity
+                    style={styles.game}
+                    onPress={() =>
+                      navigation.navigate('home', {leaderboard: leaderboard})
+                    }
+                    onLongPress={() => handleLongPress(leaderboard)}>
+                    <Text style={styles.gameText}>
+                      {pinnedLeaderboards.includes(leaderboard) ? '⭐ ' : ''}
+                    </Text>
+                    <Text style={styles.gameText} numberOfLines={2}>
+                      {leaderboard}
+                    </Text>
+                  </TouchableOpacity>
+                  {index !== 4 && index !== filteredLeaderboards.length - 1 && (
+                    <View style={styles.separator} />
+                  )}
+                </View>
+              ))
+            )}
+          </View>
+          <Text
+            style={{
+              color: colours.light_text,
+              marginBottom: 10,
+              textAlign: 'center',
+              marginBottom: 30,
+            }}>
+            (Long press to pin a leaderboard)
+          </Text>
+        </ScrollView>
         <TouchableOpacity
           onPress={() => navigation.navigate('addLeaderboard')}
           style={styles.newLeaderboardContainer}>
           <Text style={styles.newLeaderboardButtonText}>+</Text>
         </TouchableOpacity>
-      </View>
+      </>
     </TouchableWithoutFeedback>
   );
 };
@@ -229,12 +255,7 @@ export default SelectLeaderboard;
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: colours.background,
-    height: '100%',
-    display: 'flex',
-    flexDirection: 'column',
-    gap: 10,
-    alignItems: 'center',
+    backgroundColor: colours.lighter_background,
     padding: 10,
   },
   searchBar: {
@@ -251,16 +272,17 @@ const styles = StyleSheet.create({
   },
   leaderboardsContainer: {
     width: '100%',
-    backgroundColor: colours.lighter_background,
+    backgroundColor: colours.background,
     borderRadius: 10,
+    borderWidth: 2,
+    borderColor: colours.accent,
     padding: 10,
-    elevation: 7,
     display: 'flex',
     flexDirection: 'column',
     gap: 10,
+    marginBottom: 10,
   },
   game: {
-    padding: 5,
     display: 'flex',
     flexDirection: 'row',
     justifyContent: 'left',
@@ -288,7 +310,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   separator: {
-    width: '95%',
+    width: '100%',
     backgroundColor: colours.accent,
     height: 1,
     alignSelf: 'center',
@@ -343,7 +365,9 @@ const styles = StyleSheet.create({
     fontSize: 18,
   },
   selectLeaderboardText: {
-    color: colours.light_text,
-    fontSize: 15,
+    color: colours.accent,
+    fontSize: 25,
+    fontWeight: 'bold',
+    textDecorationLine: 'underline',
   },
 });

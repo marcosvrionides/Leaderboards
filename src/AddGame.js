@@ -25,12 +25,11 @@ const AddGame = ({navigation, route}) => {
   const leaderboard = route.params.leaderboard;
 
   const [numberOfPlayers, setNumberOfPlayers] = useState(2);
-  const [playerNames, setPlayerNames] = useState([]);
-  const [playersGamesWon, setPlayersGamesWon] = useState([]);
+  const [playerNames, setPlayerNames] = useState(['', '']);
+  const [playersGamesWon, setPlayersGamesWon] = useState(['', '']);
   const [gameNote, setGameNote] = useState();
   const [gameMedia, setGameMedia] = useState();
   const [playerNamesSuggestions, setPlayerNamesSuggestions] = useState([]);
-  const [filteredPlayer1Names, setFilteredPlayer1Names] = useState([]);
   const [filteredPlayersNames, setFilteredPlayersNames] = useState([[]]);
 
   const [leaderboardPasswordInput, setLeaderboardPasswordInput] = useState('');
@@ -77,7 +76,6 @@ const AddGame = ({navigation, route}) => {
 
   const filterPlayerNamesSuggestions = (player, inputText) => {
     if (inputText.length === 0) {
-      setFilteredPlayer1Names([]);
       temp = [...filteredPlayersNames];
       temp[player - 1] = [];
       setFilteredPlayersNames(temp);
@@ -89,42 +87,31 @@ const AddGame = ({navigation, route}) => {
     );
 
     temp = [...filteredPlayersNames];
-    temp[player - 1] = [filteredNames];
+    temp[player - 1] = filteredNames;
     setFilteredPlayersNames(temp);
-    setFilteredPlayer1Names(filteredNames);
   };
-  console.log(filteredPlayersNames);
 
   const saveGame = () => {
-    if (
-      player1Name.trim() === '' ||
-      player2Name.trim() === '' ||
-      player1GamesWon.trim() === '' ||
-      player2GamesWon.trim() === ''
-    ) {
-      ToastAndroid.show('Please fill out all fields.', ToastAndroid.SHORT);
-      return;
-    }
-    if (
-      !(
-        Number.isInteger(player1GamesWon) === false ||
-        Number.isInteger(player2GamesWon) === false
-      )
-    ) {
-      ToastAndroid.show('Invalid input.', ToastAndroid.SHORT);
-      return;
-    }
     if (leaderboardPasswordInput !== leaderboardPassword) {
       ToastAndroid.show('Wrong password.', ToastAndroid.SHORT);
       setWrongPassword(true);
       return;
     }
+    for (let i = 0; i < playerNames.length; i++) {
+      if (playerNames[i].trim() === '' || playersGamesWon[i].trim() === '') {
+        ToastAndroid.show('Please fill out all fields.', ToastAndroid.SHORT);
+        return;
+      }
+      if (!Number.isInteger(parseInt(playersGamesWon[i]))) {
+        ToastAndroid.show('Invalid score input.', ToastAndroid.SHORT);
+        return;
+      }
+    }
+
     const game_history_ref = database().ref('/' + leaderboard);
     const newGameRef = game_history_ref.push({
-      player_1_name: player1Name.trim(),
-      player_2_name: player2Name.trim(),
-      player_1_games_won: player1GamesWon.trim(),
-      player_2_games_won: player2GamesWon.trim(),
+      player_names: playerNames,
+      players_games_won: playersGamesWon,
       note: gameNote,
       media: gameMedia,
       timestamp: database.ServerValue.TIMESTAMP,
@@ -145,27 +132,6 @@ const AddGame = ({navigation, route}) => {
       .then(() => console.log('subscribed to topic "' + leaderboard + '"'));
 
     ToastAndroid.show('Game Saved.', ToastAndroid.SHORT);
-
-    if (InAppReview.isAvailable()) {
-      InAppReview.RequestInAppReview()
-        .then(hasFlowFinishedSuccessfully => {
-          // when return true in android it means user finished or close review flow
-          console.log('InAppReview in android', hasFlowFinishedSuccessfully);
-
-          // when return true in ios it means review flow lanuched to user.
-          console.log(
-            'InAppReview in ios has launched successfully',
-            hasFlowFinishedSuccessfully,
-          );
-          if (hasFlowFinishedSuccessfully) {
-            navigation.navigate('home', {leaderboard: leaderboard});
-            return;
-          }
-        })
-        .catch(error => {
-          console.log(error);
-        });
-    }
 
     navigation.navigate('home', {leaderboard: leaderboard});
   };
@@ -192,7 +158,6 @@ const AddGame = ({navigation, route}) => {
     temp = [...playerNames];
     temp[player - 1] = suggestion;
     setPlayerNames(temp);
-    setFilteredPlayer1Names([]);
     setFilteredPlayersNames([]);
   };
 
@@ -230,7 +195,7 @@ const AddGame = ({navigation, route}) => {
               temp = [...playerNames];
               temp[player - 1] = text;
               setPlayerNames(temp);
-              filterPlayerNamesSuggestions(1, text.toLocaleLowerCase());
+              filterPlayerNamesSuggestions(player, text.toLocaleLowerCase());
             }}
             maxLength={30}
           />
@@ -248,23 +213,27 @@ const AddGame = ({navigation, route}) => {
             maxLength={4}
           />
         </View>
-        {filteredPlayer1Names.length > 0 && (
-          <FlatList
-            keyboardShouldPersistTaps={'handled'}
-            style={styles.searchedUsersList}
-            data={filteredPlayer1Names.slice(0, 3)}
-            keyExtractor={item => item}
-            renderItem={({item}) => (
-              <TouchableOpacity
-                style={styles.searchedUserContainer}
-                onPress={() => {
-                  handleSuggestionPress(item, player);
-                }}>
-                <Text style={styles.searchedUserText}>{item}</Text>
-              </TouchableOpacity>
-            )}
-          />
-        )}
+        {filteredPlayersNames[player - 1] !== undefined &&
+          filteredPlayersNames[player - 1].length > 0 && (
+            <>
+              <Text style={styles.suggestionsTitleText}>Suggestions:</Text>
+              <FlatList
+                keyboardShouldPersistTaps={'handled'}
+                style={styles.searchedUsersList}
+                data={filteredPlayersNames[player - 1].slice(0, 3)}
+                keyExtractor={item => item}
+                renderItem={({item}) => (
+                  <TouchableOpacity
+                    style={styles.searchedUserContainer}
+                    onPress={() => {
+                      handleSuggestionPress(item, player);
+                    }}>
+                    <Text style={styles.searchedUserText}>{item}</Text>
+                  </TouchableOpacity>
+                )}
+              />
+            </>
+          )}
       </View>,
     );
   }
@@ -298,7 +267,9 @@ const AddGame = ({navigation, route}) => {
             </TouchableOpacity>
           )}
         </View>
-        <View style={styles.container}>
+        <ScrollView
+          style={styles.container}
+          keyboardShouldPersistTaps={'handled'}>
           <View style={{height: 50}} />
 
           <View style={styles.formContainer}>
@@ -367,7 +338,7 @@ const AddGame = ({navigation, route}) => {
               />
             )}
           </View>
-        </View>
+        </ScrollView>
       </View>
     </TouchableWithoutFeedback>
   );
@@ -418,6 +389,9 @@ const styles = StyleSheet.create({
     padding: 10,
     borderRadius: 5,
     flex: 0.49,
+  },
+  searchedUsersList: {
+    paddingBottom: 10,
   },
   searchedUserContainer: {
     backgroundColor: colours.secondary,
@@ -481,13 +455,6 @@ const styles = StyleSheet.create({
     fontSize: 20,
     textAlign: 'center',
   },
-  vsText: {
-    textAlign: 'center',
-    color: colours.accent,
-    fontSize: 20,
-    fontWeight: 'bold',
-    fontStyle: 'italic',
-  },
   crown: {
     position: 'absolute',
     zIndex: 1,
@@ -501,5 +468,10 @@ const styles = StyleSheet.create({
     width: '100%',
     marginTop: 20,
     textAlign: 'center',
+  },
+  suggestionsTitleText: {
+    color: colours.light_text,
+    fontSize: 13,
+    padding: 5,
   },
 });

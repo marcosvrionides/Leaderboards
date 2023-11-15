@@ -16,6 +16,9 @@ import database from '@react-native-firebase/database';
 const GameCard = props => {
   const game = props.gameData;
   const addedByCurrentUser = props.gameData.addedBy === auth().currentUser.uid;
+  const [playerNames, setPlayerNames] = useState([]);
+  const [playersGamesWon, setPlayersGamesWon] = useState([]);
+
   const [showOptions, setShowOptions] = useState();
   const [deleted, setDeleted] = useState(false);
 
@@ -29,6 +32,16 @@ const GameCard = props => {
   const date = new Date(game.timestamp);
   const formatedDate =
     date.getDate() + '/' + (date.getMonth() + 1) + '/' + date.getFullYear();
+
+  useEffect(() => {
+    if (game.player_names !== undefined) {
+      setPlayerNames(game.player_names);
+      setPlayersGamesWon(game.players_games_won);
+    } else {
+      setPlayerNames([game.player_1_name, game.player_2_name]);
+      setPlayersGamesWon([game.player_1_games_won, game.player_2_games_won]);
+    }
+  }, []);
 
   useEffect(() => {
     if (game.media !== undefined) {
@@ -65,6 +78,37 @@ const GameCard = props => {
     return null;
   }
 
+  const players = [];
+  let highestScore = -1;
+  let indexOfHighestScorer = -1;
+
+  for (let player = 0; player < playerNames.length; player++) {
+    if (playersGamesWon[player] > highestScore) {
+      highestScore = playersGamesWon[player];
+      indexOfHighestScorer = player;
+    }
+  }
+
+  for (let player = 0; player < playerNames.length; player++) {
+    players.push(
+      <>
+        <View
+          style={styles.name_score_container}
+          key={player}
+          numberOfLines={1}>
+          <Text style={styles.player_name}>{playerNames[player]}</Text>
+          <Text style={styles.player_score}>
+            {playersGamesWon[player]}
+            {player === indexOfHighestScorer && ' 👑'}
+          </Text>
+        </View>
+        {player < playerNames.length - 1 && (
+          <Text style={{fontSize: 20, fontWeight: 'bold'}}>-</Text>
+        )}
+      </>,
+    );
+  }
+
   return (
     <>
       {showOptions && (
@@ -78,23 +122,7 @@ const GameCard = props => {
       )}
       <TouchableWithoutFeedback onPress={() => setFocusView(!focusView)}>
         <View style={styles.container}>
-          <View style={styles.center_view}>
-            <View style={styles.name_score_container} numberOfLines={1}>
-              <Text style={styles.player_name}>{game.player_1_name}</Text>
-              <Text style={styles.player_score}>
-                {game.player_1_games_won}
-                {game.player_1_games_won > game.player_2_games_won && ' 👑'}
-              </Text>
-            </View>
-            <Text style={{fontSize: 20, fontWeight: 'bold'}}>-</Text>
-            <View style={styles.name_score_container} numberOfLines={1}>
-              <Text style={styles.player_name}>{game.player_2_name}</Text>
-              <Text style={styles.player_score}>
-                {game.player_2_games_won}
-                {game.player_1_games_won < game.player_2_games_won && ' 👑'}
-              </Text>
-            </View>
-          </View>
+          <View style={styles.center_view}>{players}</View>
           {game.media !== undefined || game.note !== undefined ? (
             <View style={styles.media_container}>
               <View

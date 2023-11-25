@@ -15,6 +15,7 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 import database from '@react-native-firebase/database';
 import auth from '@react-native-firebase/auth';
 import messaging from '@react-native-firebase/messaging';
+import analytics from '@react-native-firebase/analytics';
 
 const NewLeaderboardForm = ({navigation}) => {
   const [leaderboardName, setLeaderboardName] = useState('');
@@ -51,7 +52,7 @@ const NewLeaderboardForm = ({navigation}) => {
     });
   };
 
-  const saveLeaderboard = () => {
+  const saveLeaderboard = async () => {
     if (nameInUse) {
       ToastAndroid.show('This name is already in use.', ToastAndroid.SHORT);
       return;
@@ -71,6 +72,12 @@ const NewLeaderboardForm = ({navigation}) => {
     messaging()
       .subscribeToTopic(leaderboardName)
       .then(() => console.log('subscribed to topic "' + leaderboardName + '"'));
+
+    await analytics().logEvent('create_new_leaderboard', {
+      uid: auth().currentUser.uid,
+      leaderboard: leaderboardName,
+      timestamp: database.ServerValue.TIMESTAMP,
+    });
 
     navigation.navigate('home', {leaderboard: leaderboardName});
   };

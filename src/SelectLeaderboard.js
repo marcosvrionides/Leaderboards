@@ -19,6 +19,7 @@ import AntDesign from 'react-native-vector-icons/AntDesign';
 import LoadingScreen from './LoadingScreen';
 import auth from '@react-native-firebase/auth';
 import messaging from '@react-native-firebase/messaging';
+import analytics from '@react-native-firebase/analytics';
 
 const SelectLeaderboard = ({navigation}) => {
   const [leaderboards, setLeaderboards] = useState([]);
@@ -170,9 +171,14 @@ const SelectLeaderboard = ({navigation}) => {
                 <View key={index}>
                   <TouchableOpacity
                     style={styles.game}
-                    onPress={() =>
-                      navigation.navigate('home', {leaderboard: leaderboard})
-                    }
+                    onPress={async () => {
+                      await analytics().logEvent('open_leaderboard', {
+                        uid: auth().currentUser.uid,
+                        leaderboard: leaderboard,
+                        timestamp: database.ServerValue.TIMESTAMP,
+                      });
+                      navigation.navigate('home', {leaderboard: leaderboard});
+                    }}
                     onLongPress={() => handleLongPress(leaderboard)}>
                     <Text style={styles.gameText} numberOfLines={2}>
                       {leaderboard}
@@ -213,9 +219,14 @@ const SelectLeaderboard = ({navigation}) => {
                 <View key={index}>
                   <TouchableOpacity
                     style={styles.game}
-                    onPress={() =>
-                      navigation.navigate('home', {leaderboard: leaderboard})
-                    }
+                    onPress={async () => {
+                      await analytics().logEvent('open_leaderboard', {
+                        uid: auth().currentUser.uid,
+                        leaderboard: leaderboard,
+                        timestamp: database.ServerValue.TIMESTAMP,
+                      });
+                      navigation.navigate('home', {leaderboard: leaderboard});
+                    }}
                     onLongPress={() => handleLongPress(leaderboard)}>
                     <Text style={styles.gameText}>
                       {pinnedLeaderboards.includes(leaderboard) ? '⭐ ' : ''}

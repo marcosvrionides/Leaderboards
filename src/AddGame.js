@@ -19,6 +19,7 @@ import storage from '@react-native-firebase/storage';
 import InAppReview from 'react-native-in-app-review';
 import auth from '@react-native-firebase/auth';
 import messaging from '@react-native-firebase/messaging';
+import analytics from '@react-native-firebase/analytics';
 
 const AddGame = ({navigation, route}) => {
   const leaderboard = route.params.leaderboard;
@@ -101,7 +102,7 @@ const AddGame = ({navigation, route}) => {
     }
   };
 
-  const saveGame = () => {
+  const saveGame = async () => {
     if (
       player1Name.trim() === '' ||
       player2Name.trim() === '' ||
@@ -135,6 +136,21 @@ const AddGame = ({navigation, route}) => {
       media: gameMedia,
       timestamp: database.ServerValue.TIMESTAMP,
       addedBy: auth().currentUser.uid,
+    });
+
+    await analytics().logEvent('add_game', {
+      uid: auth().currentUser.uid,
+      leaderboard: leaderboard,
+      game:
+        player1Name.trim() +
+        '(' +
+        player1GamesWon.trim() +
+        ')' +
+        player2Name.trim() +
+        '(' +
+        player2GamesWon.trim() +
+        ')',
+      timestamp: database.ServerValue.TIMESTAMP,
     });
 
     if (gameMedia !== undefined) {

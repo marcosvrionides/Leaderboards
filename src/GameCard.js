@@ -12,6 +12,7 @@ import colors from './Colours';
 import storage from '@react-native-firebase/storage';
 import auth from '@react-native-firebase/auth';
 import database from '@react-native-firebase/database';
+import analytics from '@react-native-firebase/analytics';
 
 const GameCard = props => {
   const game = props.gameData;
@@ -52,11 +53,17 @@ const GameCard = props => {
     }
   }, [game.media, game.key]);
 
-  const handleDeleteGame = () => {
+  const handleDeleteGame = async () => {
     const gameRef = database().ref(
       '/' + props.leaderboardName + '/' + game.key + '/',
     );
     gameRef.remove();
+    await analytics().logEvent('delete_game', {
+      uid: auth().currentUser.uid,
+      leaderboard: leaderboardName,
+      game: game.key,
+      timestamp: database.ServerValue.TIMESTAMP,
+    });
     setDeleted(true);
     ToastAndroid.show('Game deleted', ToastAndroid.SHORT);
   };

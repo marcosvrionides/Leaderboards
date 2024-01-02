@@ -7,7 +7,7 @@ import LoadingScreen from './LoadingScreen';
 const SetsLeaderboard = ({leaderboardName, gameHistoryData}) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [LeaderboardData, setLeaderboardData] = useState([]);
-  const [sortBy, setSortBy] = useState('winRate');
+  const [sortBy, setSortBy] = useState('default');
   const [sortAscending, setSortAscending] = useState(false);
 
   useEffect(() => {
@@ -85,18 +85,43 @@ const SetsLeaderboard = ({leaderboardName, gameHistoryData}) => {
     setLeaderboardData(tempLeaderboardData);
   }, [gameHistoryData]);
 
+  const ci_lower_bound = player => {
+    if (player.wins + player.losses === 0) {
+      return 0;
+    }
+    const z = 1.96;
+    const n = player.wins + player.losses;
+    const phat = player.wins / n;
+    const score =
+      (phat +
+        (z * z) / (2 * n) -
+        z * Math.sqrt((phat * (1 - phat) + (z * z) / (4 * n)) / n)) /
+      (1 + (z * z) / n);
+    return score;
+  };
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Games</Text>
       <View style={styles.tableHeaderRow}>
-        <Text
-          style={[
-            styles.columnHeader,
-            styles.columnHeaderText,
-            styles.narrowColumn,
-          ]}>
-          #
-        </Text>
+        <TouchableOpacity
+          style={[styles.columnHeader, styles.narrowColumn]}
+          onPress={() => {
+            setSortBy('default');
+            setSortAscending(sortBy !== 'default' ? false : !sortAscending);
+          }}>
+          <Text style={[styles.columnHeaderText]}>
+            {sortBy === 'default' && (
+              <FontAwesome5
+                name={
+                  sortAscending ? 'sort-amount-up-alt' : 'sort-amount-down-alt'
+                }
+                color={colours.text}
+              />
+            )}{' '}
+            #
+          </Text>
+        </TouchableOpacity>
         <Text style={[styles.columnHeader, styles.columnHeaderText]}>
           Player
         </Text>
@@ -180,6 +205,12 @@ const SetsLeaderboard = ({leaderboardName, gameHistoryData}) => {
             } else {
               return b.winRate - a.winRate;
             }
+          } else if (sortBy === 'default') {
+            if (sortAscending) {
+              return ci_lower_bound(a) - ci_lower_bound(b);
+            } else {
+              return ci_lower_bound(b) - ci_lower_bound(a);
+            }
           }
         })
           .slice(0, isExpanded ? LeaderboardData.length : 3)
@@ -261,7 +292,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   narrowColumn: {
-    flex: 0.25,
+    flex: 0.3,
   },
   tableRow: {
     width: '100%',

@@ -51,6 +51,7 @@ const Leaderboard = ({leaderboardName, gameHistoryData}) => {
       const totalGames = playerData.wins + playerData.losses;
       if (totalGames > 0) {
         playerData.winRate = Math.round((playerData.wins / totalGames) * 100); // Calculate win rate as a percentage
+        playerData.Score = ci_lower_bound(leaderboardDataMap[playerName]);
       } else {
         playerData.winRate = 0; // Default win rate to 0 if no games played
       }
@@ -81,24 +82,14 @@ const Leaderboard = ({leaderboardName, gameHistoryData}) => {
     <View style={styles.container}>
       <Text style={styles.title}>Total Points</Text>
       <View style={styles.tableHeaderRow}>
-        <TouchableOpacity
-          style={[styles.columnHeader, styles.narrowColumn]}
-          onPress={() => {
-            setSortBy('default');
-            setSortAscending(sortBy !== 'default' ? false : !sortAscending);
-          }}>
-          <Text style={styles.columnHeaderText}>
-            {sortBy === 'default' && (
-              <FontAwesome5
-                name={
-                  sortAscending ? 'sort-amount-up-alt' : 'sort-amount-down-alt'
-                }
-                color={colours.text}
-              />
-            )}{' '}
-            #
-          </Text>
-        </TouchableOpacity>
+        <Text
+          style={[
+            styles.columnHeaderText,
+            styles.columnHeader,
+            styles.narrowColumn,
+          ]}>
+          #
+        </Text>
         <Text style={[styles.columnHeader, styles.columnHeaderText]}>
           Player
         </Text>
@@ -116,7 +107,8 @@ const Leaderboard = ({leaderboardName, gameHistoryData}) => {
                 }
                 color={colours.text}
               />
-            )}{' '}
+            )}
+            {sortBy === 'wins' && ' '}
             Wins
           </Text>
         </TouchableOpacity>
@@ -135,7 +127,8 @@ const Leaderboard = ({leaderboardName, gameHistoryData}) => {
                 }
                 color={colours.text}
               />
-            )}{' '}
+            )}
+            {sortBy === 'losses' && ' '}
             Losses
           </Text>
         </TouchableOpacity>
@@ -154,8 +147,29 @@ const Leaderboard = ({leaderboardName, gameHistoryData}) => {
                 }
                 color={colours.text}
               />
-            )}{' '}
+            )}
+            {sortBy === 'winRate' && ' '}
             Win Rate
+          </Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={styles.columnHeader}
+          onPress={() => {
+            setSortBy('default');
+            setSortAscending(sortBy !== 'default' ? false : !sortAscending);
+          }}>
+          <Text style={styles.columnHeaderText}>
+            {sortBy === 'default' && (
+              <FontAwesome5
+                name={
+                  sortAscending ? 'sort-amount-up-alt' : 'sort-amount-down-alt'
+                }
+                color={colours.text}
+              />
+            )}
+            {sortBy === 'default' && ' '}
+            Score
           </Text>
         </TouchableOpacity>
       </View>
@@ -201,6 +215,11 @@ const Leaderboard = ({leaderboardName, gameHistoryData}) => {
                   : index === 2 && !isExpanded
                   ? {opacity: 0.5}
                   : {opacity: 1},
+                index % 2 !== 0 && {
+                  backgroundColor: colours.lighter_background,
+                },
+                (index === LeaderboardData.length - 1 ||
+                  (index === 2 && !isExpanded)) && {borderBottomWidth: 0},
               ]}
               key={index}>
               <Text style={[styles.tableCell, styles.narrowColumn]}>
@@ -217,6 +236,9 @@ const Leaderboard = ({leaderboardName, gameHistoryData}) => {
               </Text>
               <Text style={styles.tableCell} numberOfLines={1}>
                 {item.winRate}%
+              </Text>
+              <Text style={styles.tableCell} numberOfLines={1}>
+                {Math.round(item.Score * 100)}
               </Text>
             </View>
           ))
@@ -260,6 +282,7 @@ const styles = StyleSheet.create({
   },
   columnHeader: {
     flex: 1,
+    paddingHorizontal: 1,
   },
   columnHeaderText: {
     fontSize: 16,
@@ -269,12 +292,14 @@ const styles = StyleSheet.create({
   },
   narrowColumn: {
     flex: 0.3,
+    paddingHorizontal: 1,
   },
   tableRow: {
     width: '100%',
     display: 'flex',
     flexDirection: 'row',
     justifyContent: 'space-evenly',
+    borderBottomWidth: 1,
     paddingVertical: 5,
   },
   tableCell: {
@@ -282,6 +307,7 @@ const styles = StyleSheet.create({
     fontSize: 15,
     color: colours.text,
     textAlign: 'center',
+    paddingHorizontal: 1,
   },
   showMoreButton: {
     padding: 10,

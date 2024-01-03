@@ -13,14 +13,11 @@ import SetsLeaderboard from './SetsLeaderboard';
 import GameHistory from './GameHistory';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import {useFocusEffect} from '@react-navigation/native';
-import Players from './Players';
 import database from '@react-native-firebase/database';
 import colors from './Colours';
 
 const Home = ({navigation, route}) => {
   const leaderboard = route.params.leaderboard;
-
-  const [currentScreen, setCurrentScreen] = useState('home');
 
   const [gameHistoryData, setGameHistoryData] = useState([]);
   const [noData, setNoData] = useState();
@@ -90,27 +87,6 @@ const Home = ({navigation, route}) => {
             <Text style={styles.addGameButtonText}>+</Text>
           </TouchableOpacity>
         </View>
-
-        {!noData && (
-          <View style={styles.navigationBar}>
-            <TouchableOpacity
-              style={[
-                styles.navigationBarButton,
-                currentScreen === 'home' && {borderBottomWidth: 2},
-              ]}
-              onPress={() => setCurrentScreen('home')}>
-              <Text style={styles.navigationBarButtonText}>Home</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={[
-                styles.navigationBarButton,
-                currentScreen === 'players' && {borderBottomWidth: 2},
-              ]}
-              onPress={() => setCurrentScreen('players')}>
-              <Text style={styles.navigationBarButtonText}>Players</Text>
-            </TouchableOpacity>
-          </View>
-        )}
       </View>
       {noData ? (
         <View style={styles.addFirstGameContainer}>
@@ -124,31 +100,21 @@ const Home = ({navigation, route}) => {
         </View>
       ) : (
         <View>
-          {currentScreen === 'home' ? (
-            <ScrollView>
-              <View style={{height: 90}} />
-              <SetsLeaderboard
-                leaderboardName={leaderboard}
-                gameHistoryData={gameHistoryData}
-              />
-              <Leaderboard
-                leaderboardName={leaderboard}
-                gameHistoryData={gameHistoryData}
-              />
-              <GameHistory
-                leaderboardName={leaderboard}
-                gameHistoryData={gameHistoryData}
-              />
-            </ScrollView>
-          ) : currentScreen === 'players' ? (
-            <ScrollView>
-              <View style={{height: 90}} />
-              <Players
-                leaderboardName={leaderboard}
-                gameHistoryData={gameHistoryData}
-              />
-            </ScrollView>
-          ) : null}
+          <ScrollView>
+            <View style={{height: 45}} />
+            <SetsLeaderboard
+              leaderboardName={leaderboard}
+              gameHistoryData={gameHistoryData}
+            />
+            <Leaderboard
+              leaderboardName={leaderboard}
+              gameHistoryData={gameHistoryData}
+            />
+            <GameHistory
+              leaderboardName={leaderboard}
+              gameHistoryData={gameHistoryData}
+            />
+          </ScrollView>
         </View>
       )}
     </View>

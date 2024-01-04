@@ -7,12 +7,15 @@ import {
   TouchableOpacity,
   ToastAndroid,
 } from 'react-native';
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useState, useRef} from 'react';
 import colors from './Colours';
 import storage from '@react-native-firebase/storage';
 import auth from '@react-native-firebase/auth';
 import database from '@react-native-firebase/database';
 import analytics from '@react-native-firebase/analytics';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import Share from 'react-native-share';
+import ViewShot from 'react-native-view-shot';
 
 const GameCard = props => {
   const game = props.gameData;
@@ -26,6 +29,9 @@ const GameCard = props => {
     width: 50,
     height: 50,
   });
+
+  const gameCardRef = useRef();
+  const [shareMode, setShareMode] = useState(false);
 
   const date = new Date(game.timestamp);
   const formatedDate =
@@ -72,9 +78,40 @@ const GameCard = props => {
     return null;
   }
 
+  // share GameCard view
+  const handleShare = () => {
+    setFocusView(true);
+    setShareMode(true);
+  };
+
+  useEffect(() => {
+    if (focusView && shareMode) {
+      gameCardRef.current.capture().then(uri => {
+        Share.open({
+          message:
+            'Download Leaderboards on the Play Store: https://play.google.com/store/apps/details?id=com.backgammon_leaderboards',
+          url: uri,
+        })
+          .then(res => {
+            setShareMode(false);
+          })
+          .catch(err => {
+            console.log(err);
+            setShareMode(false);
+          });
+      });
+    }
+  }, [focusView, shareMode]);
+
   return (
-    <>
-      {showOptions && (
+    <ViewShot
+      ref={gameCardRef}
+      options={{
+        fileName: 'leaderboards-game-card',
+        format: 'jpg',
+        quality: 0.9,
+      }}>
+      {showOptions && !shareMode && (
         <View style={styles.gameOptionsContainer}>
           <TouchableOpacity
             style={styles.deleteGameButton}
@@ -84,7 +121,7 @@ const GameCard = props => {
         </View>
       )}
       <TouchableWithoutFeedback onPress={() => setFocusView(!focusView)}>
-        <View style={styles.container}>
+        <View style={[styles.container, shareMode && {marginBottom: 0}]}>
           <View style={styles.center_view}>
             <View style={styles.name_score_container} numberOfLines={1}>
               <Text style={styles.player_name}>{game.player_1_name}</Text>
@@ -138,7 +175,7 @@ const GameCard = props => {
           <Text style={styles.date} numberOfLines={1}>
             {formatedDate}
           </Text>
-          {addedByCurrentUser && (
+          {addedByCurrentUser && !shareMode && (
             <TouchableOpacity
               style={styles.options}
               onPress={() => setShowOptions(!showOptions)}>
@@ -149,7 +186,24 @@ const GameCard = props => {
           )}
         </View>
       </TouchableWithoutFeedback>
-    </>
+      {!shareMode && (
+        <TouchableOpacity
+          style={styles.shareButton}
+          onPress={() => handleShare()}>
+          <MaterialCommunityIcons
+            name={'share'}
+            size={20}
+            color={colors.text}
+          />
+        </TouchableOpacity>
+      )}
+      {shareMode && (
+        <View style={styles.watermark}>
+          <Text style={styles.appName}>Leaderboards</Text>
+          <Text style={styles.appAuthor}>by: Marcos Vrionides</Text>
+        </View>
+      )}
+    </ViewShot>
   );
 };
 
@@ -246,5 +300,28 @@ const styles = StyleSheet.create({
   deleteGameText: {
     color: colors.light_text,
     fontSize: 15,
+  },
+  shareButton: {
+    position: 'absolute',
+    bottom: 20,
+    right: 12.5,
+    zIndex: 2,
+  },
+  watermark: {
+    zIndex: 1,
+    width: '100%',
+    paddingBottom: 10,
+  },
+  appName: {
+    textAlign: 'center',
+    color: colors.accent,
+    fontSize: 40,
+    fontWeight: 'bold',
+  },
+  appAuthor: {
+    textAlign: 'center',
+    color: colors.accent,
+    fontSize: 20,
+    fontWeight: 'bold',
   },
 });

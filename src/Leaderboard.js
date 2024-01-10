@@ -208,13 +208,6 @@ const Leaderboard = ({leaderboardName, gameHistoryData}) => {
             <View
               style={[
                 styles.tableRow,
-                index === 0 && !isExpanded
-                  ? {opacity: 1}
-                  : index === 1 && !isExpanded
-                  ? {opacity: 0.75}
-                  : index === 2 && !isExpanded
-                  ? {opacity: 0.5}
-                  : {opacity: 1},
                 index % 2 !== 0 && {
                   backgroundColor: colours.lighter_background,
                 },

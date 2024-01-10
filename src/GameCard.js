@@ -104,14 +104,8 @@ const GameCard = props => {
   }, [focusView, shareMode]);
 
   return (
-    <ViewShot
-      ref={gameCardRef}
-      options={{
-        fileName: 'leaderboards-game-card',
-        format: 'jpg',
-        quality: 0.9,
-      }}>
-      {showOptions && !shareMode && (
+    <View>
+      {showOptions && (
         <View style={styles.gameOptionsContainer}>
           <TouchableOpacity
             style={styles.deleteGameButton}
@@ -121,7 +115,7 @@ const GameCard = props => {
         </View>
       )}
       <TouchableWithoutFeedback onPress={() => setFocusView(!focusView)}>
-        <View style={[styles.container, shareMode && {marginBottom: 0}]}>
+        <View style={styles.container}>
           <View style={styles.center_view}>
             <View style={styles.name_score_container} numberOfLines={1}>
               <Text style={styles.player_name}>{game.player_1_name}</Text>
@@ -154,18 +148,78 @@ const GameCard = props => {
                   flexDirection: focusView ? 'column' : 'row',
                   gap: 10,
                 }}>
-                {game.media !== undefined && mediaUrl !== undefined && (
-                  <Image
-                    style={[
-                      {
-                        aspectRatio:
-                          mediaDimensions.width / mediaDimensions.height,
-                      },
-                      focusView ? styles.media_large : styles.media_small,
-                    ]}
-                    src={mediaUrl}
-                  />
-                )}
+                <ViewShot
+                  ref={gameCardRef}
+                  options={{
+                    fileName: 'leaderboards-game-card',
+                    format: 'jpg',
+                    quality: 0.9,
+                  }}>
+                  {game.media !== undefined && mediaUrl !== undefined && (
+                    <Image
+                      style={[
+                        {
+                          aspectRatio:
+                            mediaDimensions.width / mediaDimensions.height,
+                        },
+                        focusView ? styles.media_large : styles.media_small,
+                      ]}
+                      src={mediaUrl}
+                    />
+                  )}
+                  {shareMode && game.media !== undefined && (
+                    <View style={styles.watermark}>
+                      <View
+                        style={[
+                          styles.center_view,
+                          {backgroundColor: 'rgba(0, 0, 0, 0.5)', padding: 10},
+                        ]}>
+                        <View
+                          style={styles.name_score_container}
+                          numberOfLines={1}>
+                          <Text style={[styles.player_name, {color: 'white'}]}>
+                            {game.player_1_name}
+                          </Text>
+                          <Text style={[styles.player_score, {color: 'white'}]}>
+                            {game.player_1_games_won}
+                            {game.player_1_games_won >
+                              game.player_2_games_won && ' 👑'}
+                          </Text>
+                        </View>
+                        <Text
+                          style={{
+                            fontSize: 20,
+                            fontWeight: 'bold',
+                            color: 'white',
+                          }}>
+                          -
+                        </Text>
+                        <View
+                          style={styles.name_score_container}
+                          numberOfLines={1}>
+                          <Text style={[styles.player_name, {color: 'white'}]}>
+                            {game.player_2_name}
+                          </Text>
+                          <Text style={[styles.player_score, {color: 'white'}]}>
+                            {game.player_2_games_won}
+                            {game.player_1_games_won <
+                              game.player_2_games_won && ' 👑'}
+                          </Text>
+                        </View>
+                      </View>
+                      <View
+                        style={{
+                          backgroundColor: 'rgba(0, 0, 0, 0.5)',
+                          paddingBottom: 10,
+                        }}>
+                        <Text style={styles.appName}>Leaderboards</Text>
+                        <Text style={styles.appAuthor}>
+                          by: Marcos Vrionides
+                        </Text>
+                      </View>
+                    </View>
+                  )}
+                </ViewShot>
                 {game.note !== undefined && (
                   <Text style={styles.note}>{game.note}</Text>
                 )}
@@ -175,7 +229,7 @@ const GameCard = props => {
           <Text style={styles.date} numberOfLines={1}>
             {formatedDate}
           </Text>
-          {addedByCurrentUser && !shareMode && (
+          {addedByCurrentUser && (
             <TouchableOpacity
               style={styles.options}
               onPress={() => setShowOptions(!showOptions)}>
@@ -186,7 +240,7 @@ const GameCard = props => {
           )}
         </View>
       </TouchableWithoutFeedback>
-      {!shareMode && (
+      {game.media && (
         <TouchableOpacity
           style={styles.shareButton}
           onPress={() => handleShare()}>
@@ -197,13 +251,7 @@ const GameCard = props => {
           />
         </TouchableOpacity>
       )}
-      {shareMode && (
-        <View style={styles.watermark}>
-          <Text style={styles.appName}>Leaderboards</Text>
-          <Text style={styles.appAuthor}>by: Marcos Vrionides</Text>
-        </View>
-      )}
-    </ViewShot>
+    </View>
   );
 };
 
@@ -310,7 +358,10 @@ const styles = StyleSheet.create({
   watermark: {
     zIndex: 1,
     width: '100%',
+    position: 'absolute',
+    bottom: 0,
     paddingBottom: 10,
+    display: 'flex',
   },
   appName: {
     textAlign: 'center',
@@ -322,6 +373,5 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     color: colors.accent,
     fontSize: 20,
-    fontWeight: 'bold',
   },
 });

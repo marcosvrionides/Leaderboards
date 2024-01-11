@@ -19,6 +19,7 @@
     "@react-native-firebase/storage": "^18.5.0",
     "@react-navigation/native": "^6.1.7",
     "@react-navigation/native-stack": "^6.9.13",
+    "lottie-react-native": "^6.5.1",
     "react": "18.2.0",
     "react-native": "0.72.4",
     "react-native-google-mobile-ads": "^12.2.0",

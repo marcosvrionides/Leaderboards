@@ -16,7 +16,6 @@ import colours from './Colours';
 import database from '@react-native-firebase/database';
 import {ToastAndroid, FlatList} from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import * as MediaPicker from 'react-native-image-picker';
 import storage from '@react-native-firebase/storage';
 import InAppReview from 'react-native-in-app-review';
 import auth from '@react-native-firebase/auth';

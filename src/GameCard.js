@@ -16,6 +16,7 @@ import analytics from '@react-native-firebase/analytics';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import Share from 'react-native-share';
 import ViewShot from 'react-native-view-shot';
+import LottieView from 'lottie-react-native';
 
 const GameCard = props => {
   const game = props.gameData;
@@ -36,6 +37,12 @@ const GameCard = props => {
   const date = new Date(game.timestamp);
   const formatedDate =
     date.getDate() + '/' + (date.getMonth() + 1) + '/' + date.getFullYear();
+
+  const [liked, setLiked] = useState(false);
+  const [likedCount, setLikedCount] = useState(0);
+
+  const animationRef = useRef(null);
+  const isFirstRun = useRef(true);
 
   useEffect(() => {
     if (game.media !== undefined) {
@@ -66,7 +73,7 @@ const GameCard = props => {
     gameRef.remove();
     await analytics().logEvent('delete_game', {
       uid: auth().currentUser.uid,
-      leaderboard: leaderboardName,
+      leaderboard: props.leaderboardName,
       game: game.key,
       timestamp: database.ServerValue.TIMESTAMP,
     });
@@ -102,6 +109,81 @@ const GameCard = props => {
       });
     }
   }, [focusView, shareMode]);
+
+  useEffect(() => {
+    const checkUserLike = async () => {
+      const gameLikesRef = database().ref(
+        '/' + props.leaderboardName + '/' + game.key + '/likes',
+      );
+
+      try {
+        const snapshot = await gameLikesRef
+          .orderByValue()
+          .equalTo(auth().currentUser.uid)
+          .once('value');
+
+        setLiked(snapshot.exists());
+      } catch (error) {
+        console.error('Error checking user like:', error);
+      }
+    };
+
+    checkUserLike();
+  }, []);
+
+  useEffect(() => {
+    const gameLikesRef = database().ref(
+      '/' + props.leaderboardName + '/' + game.key + '/likes',
+    );
+
+    // Use the 'value' event to listen for changes in the likes
+    const likesListener = gameLikesRef.on('value', snapshot => {
+      // Get the count of likes
+      const count = snapshot.numChildren();
+
+      // Set the count to the state variable
+      setLikedCount(count);
+    });
+
+    // Clean up the listener when the component unmounts
+    return () => {
+      gameLikesRef.off('value', likesListener);
+    };
+  }, [props.leaderboardName, game.key]);
+
+  const handleLike = async () => {
+    const gameLikesRef = database().ref(
+      '/' + props.leaderboardName + '/' + game.key + '/likes',
+    );
+    const snapshot = await gameLikesRef
+      .orderByValue()
+      .equalTo(auth().currentUser.uid)
+      .once('value');
+    if (snapshot.exists()) {
+      snapshot.forEach(childSnapshot => {
+        childSnapshot.ref.remove();
+        setLiked(false);
+      });
+    } else {
+      gameLikesRef.push(auth().currentUser.uid);
+      setLiked(true);
+    }
+  };
+
+  useEffect(() => {
+    if (isFirstRun.current) {
+      if (!liked) {
+        animationRef.current?.play(19, 19);
+      } else {
+        animationRef.current?.play(50, 50);
+      }
+      isFirstRun.current = false;
+    } else if (liked) {
+      animationRef.current.play(19, 50);
+    } else if (!liked) {
+      animationRef.current.play(0, 19);
+    }
+  }, [liked]);
 
   return (
     <View>
@@ -226,6 +308,31 @@ const GameCard = props => {
               </View>
             </View>
           ) : null}
+          <View style={styles.bottomButtonsContainer}>
+            <View style={styles.likesContainer}>
+              <TouchableWithoutFeedback onPress={() => handleLike()}>
+                <LottieView
+                  style={styles.heartLottie}
+                  ref={animationRef}
+                  source={require('./assets/Animation.json')}
+                  autoPlay={false}
+                  loop={false}
+                />
+              </TouchableWithoutFeedback>
+              <Text style={styles.likeCountText}>{likedCount}</Text>
+            </View>
+            {game.media && (
+              <TouchableOpacity
+                style={styles.shareButton}
+                onPress={() => handleShare()}>
+                <MaterialCommunityIcons
+                  name={'share'}
+                  size={20}
+                  color={colors.text}
+                />
+              </TouchableOpacity>
+            )}
+          </View>
           <Text style={styles.date} numberOfLines={1}>
             {formatedDate}
           </Text>
@@ -240,17 +347,6 @@ const GameCard = props => {
           )}
         </View>
       </TouchableWithoutFeedback>
-      {game.media && (
-        <TouchableOpacity
-          style={styles.shareButton}
-          onPress={() => handleShare()}>
-          <MaterialCommunityIcons
-            name={'share'}
-            size={20}
-            color={colors.text}
-          />
-        </TouchableOpacity>
-      )}
     </View>
   );
 };
@@ -349,11 +445,28 @@ const styles = StyleSheet.create({
     color: colors.light_text,
     fontSize: 15,
   },
-  shareButton: {
-    position: 'absolute',
-    bottom: 20,
-    right: 12.5,
-    zIndex: 2,
+  bottomButtonsContainer: {
+    display: 'flex',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: 10,
+    marginHorizontal: 5,
+    height: 30,
+  },
+  likeCountText: {
+    alignSelf: 'center',
+    color: colors.light_text,
+  },
+  shareButton: {justifyContent: 'center'},
+  likesContainer: {
+    display: 'flex',
+    flexDirection: 'row',
+    gap: 10,
+  },
+  heartLottie: {
+    width: 50,
+    height: 50,
+    margin: -10,
   },
   watermark: {
     zIndex: 1,

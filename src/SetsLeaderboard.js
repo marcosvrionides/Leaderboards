@@ -10,79 +10,84 @@ const SetsLeaderboard = ({leaderboardName, gameHistoryData}) => {
   const [sortBy, setSortBy] = useState('default');
   const [sortAscending, setSortAscending] = useState(false);
 
-  useEffect(() => {
-    const leaderboardDataMap = {}; // Create an empty object to store leaderboard data
-
-    // Loop through the gameHistoryData
-    for (let i = 0; i < gameHistoryData.length; i++) {
-      const player1Name = gameHistoryData[i].player_1_name;
-      const player2Name = gameHistoryData[i].player_2_name;
-      const player1Wins = parseInt(gameHistoryData[i].player_1_games_won, 10); // Convert to integer
-      const player2Wins = parseInt(gameHistoryData[i].player_2_games_won, 10); // Convert to integer
-      const winner = player1Wins > player2Wins ? player1Name : player2Name;
-
-      // Update player 1's wins in the leaderboardDataMap
-      if (leaderboardDataMap[player1Name]) {
-        if (winner === player1Name) {
-          leaderboardDataMap[player1Name].wins += 1;
-        } else {
-          leaderboardDataMap[player1Name].losses += 1;
-        }
-      } else if (winner === player1Name) {
-        leaderboardDataMap[player1Name] = {
-          player: player1Name,
-          wins: 1,
-          losses: 0,
-          winRate: 100,
-        };
-      } else {
-        leaderboardDataMap[player1Name] = {
-          player: player1Name,
-          wins: 0,
-          losses: 1,
-          winRate: 0,
-        };
-      }
-
-      // Update player 2's wins in the leaderboardDataMap
-      if (leaderboardDataMap[player2Name]) {
-        if (winner === player2Name) {
-          leaderboardDataMap[player2Name].wins += 1;
-        } else {
-          leaderboardDataMap[player2Name].losses += 1;
-        }
-      } else if (winner === player2Name) {
-        leaderboardDataMap[player2Name] = {
-          player: player2Name,
-          wins: 1,
-          losses: 0,
-          winRate: 100,
-        };
-      } else {
-        leaderboardDataMap[player2Name] = {
-          player: player2Name,
-          wins: 0,
-          losses: 1,
-          winRate: 0,
-        };
-      }
+  const updatePlayerData = (
+    playerName,
+    opponent,
+    winner,
+    leaderboardDataMap,
+  ) => {
+    if (!leaderboardDataMap[playerName]) {
+      leaderboardDataMap[playerName] = {
+        player: playerName,
+        wins: 0,
+        losses: 0,
+        winRate: 0,
+        eloRating: 1200, // Initial Elo rating
+      };
     }
 
-    // Calculate and update win rates for all players
+    if (winner === playerName) {
+      leaderboardDataMap[playerName].wins += 1;
+    } else {
+      leaderboardDataMap[playerName].losses += 1;
+    }
+
+    // Calculate Elo rating
+    const playerRating = leaderboardDataMap[playerName].eloRating;
+    const opponentName = opponent;
+    const opponentRating = (
+      leaderboardDataMap[opponentName] || {eloRating: 1200}
+    ).eloRating;
+    const outcome = winner === playerName ? 1 : 0;
+    leaderboardDataMap[playerName].eloRating = calculateElo(
+      playerRating,
+      opponentRating,
+      outcome,
+    );
+  };
+
+  useEffect(() => {
+    const leaderboardDataMap = {};
+
+    for (const game of gameHistoryData) {
+      const {
+        player_1_name,
+        player_2_name,
+        player_1_games_won,
+        player_2_games_won,
+      } = game;
+      const player1Wins = parseInt(player_1_games_won, 10);
+      const player2Wins = parseInt(player_2_games_won, 10);
+      const winner = player1Wins > player2Wins ? player_1_name : player_2_name;
+
+      updatePlayerData(
+        player_1_name,
+        player_2_name,
+        winner,
+        leaderboardDataMap,
+      );
+      updatePlayerData(
+        player_2_name,
+        player_1_name,
+        winner,
+        leaderboardDataMap,
+      );
+    }
+
     for (const playerName in leaderboardDataMap) {
-      const playerData = leaderboardDataMap[playerName];
-      const {wins, losses} = playerData;
+      const {wins, losses} = leaderboardDataMap[playerName];
 
       if (wins + losses > 0) {
         const winRate = (wins / (wins + losses)) * 100;
-        playerData.winRate = Math.round(winRate);
-        playerData.Score = ci_lower_bound(leaderboardDataMap[playerName]);
+        leaderboardDataMap[playerName].winRate = Math.round(winRate);
+        // Assuming ci_lower_bound is a defined function
+        leaderboardDataMap[playerName].Score = ci_lower_bound(
+          leaderboardDataMap[playerName],
+        );
       }
     }
 
-    // Convert the leaderboardDataMap object to an array
     const tempLeaderboardData = Object.values(leaderboardDataMap);
-
     setLeaderboardData(tempLeaderboardData);
   }, [gameHistoryData]);
 
@@ -99,6 +104,18 @@ const SetsLeaderboard = ({leaderboardName, gameHistoryData}) => {
         z * Math.sqrt((phat * (1 - phat) + (z * z) / (4 * n)) / n)) /
       (1 + (z * z) / n);
     return score;
+  };
+
+  // Function to calculate Elo rating
+  const calculateElo = (playerRating, opponentRating, outcome) => {
+    const k = 32; // K-factor, determines the sensitivity of the rating change
+    const expectedOutcome =
+      1 / (1 + 10 ** ((opponentRating - playerRating) / 400));
+
+    // Update the player's rating based on the outcome
+    const newRating = playerRating + k * (outcome - expectedOutcome);
+
+    return newRating;
   };
 
   return (
@@ -123,7 +140,7 @@ const SetsLeaderboard = ({leaderboardName, gameHistoryData}) => {
             setSortBy('wins');
             setSortAscending(sortBy !== 'wins' ? false : !sortAscending);
           }}>
-          <Text style={styles.columnHeaderText}>
+          <View style={styles.columnHeaderCell}>
             {sortBy === 'wins' && (
               <FontAwesome5
                 name={
@@ -132,9 +149,8 @@ const SetsLeaderboard = ({leaderboardName, gameHistoryData}) => {
                 color={colours.text}
               />
             )}
-            {sortBy === 'wins' && ' '}
-            Wins
-          </Text>
+            <Text style={styles.columnHeaderText}>Wins</Text>
+          </View>
         </TouchableOpacity>
 
         <TouchableOpacity
@@ -143,7 +159,7 @@ const SetsLeaderboard = ({leaderboardName, gameHistoryData}) => {
             setSortBy('losses');
             setSortAscending(sortBy !== 'losses' ? false : !sortAscending);
           }}>
-          <Text style={styles.columnHeaderText}>
+          <View style={styles.columnHeaderCell}>
             {sortBy === 'losses' && (
               <FontAwesome5
                 name={
@@ -152,9 +168,8 @@ const SetsLeaderboard = ({leaderboardName, gameHistoryData}) => {
                 color={colours.text}
               />
             )}
-            {sortBy === 'losses' && ' '}
-            Losses
-          </Text>
+            <Text style={styles.columnHeaderText}>Losses</Text>
+          </View>
         </TouchableOpacity>
 
         <TouchableOpacity
@@ -163,7 +178,7 @@ const SetsLeaderboard = ({leaderboardName, gameHistoryData}) => {
             setSortBy('winRate');
             setSortAscending(sortBy !== 'winRate' ? false : !sortAscending);
           }}>
-          <Text style={styles.columnHeaderText}>
+          <View style={styles.columnHeaderCell}>
             {sortBy === 'winRate' && (
               <FontAwesome5
                 name={
@@ -172,9 +187,8 @@ const SetsLeaderboard = ({leaderboardName, gameHistoryData}) => {
                 color={colours.text}
               />
             )}
-            {sortBy === 'winRate' && ' '}
-            Win Rate
-          </Text>
+            <Text style={styles.columnHeaderText}>Win Rate</Text>
+          </View>
         </TouchableOpacity>
 
         <TouchableOpacity
@@ -183,7 +197,7 @@ const SetsLeaderboard = ({leaderboardName, gameHistoryData}) => {
             setSortBy('default');
             setSortAscending(sortBy !== 'default' ? false : !sortAscending);
           }}>
-          <Text style={styles.columnHeaderText}>
+          <View style={styles.columnHeaderCell}>
             {sortBy === 'default' && (
               <FontAwesome5
                 name={
@@ -192,9 +206,8 @@ const SetsLeaderboard = ({leaderboardName, gameHistoryData}) => {
                 color={colours.text}
               />
             )}
-            {sortBy === 'default' && ' '}
-            Score
-          </Text>
+            <Text style={styles.columnHeaderText}>Elo</Text>
+          </View>
         </TouchableOpacity>
       </View>
       {gameHistoryData.length === 0 ? (
@@ -221,9 +234,9 @@ const SetsLeaderboard = ({leaderboardName, gameHistoryData}) => {
             }
           } else if (sortBy === 'default') {
             if (sortAscending) {
-              return ci_lower_bound(a) - ci_lower_bound(b);
+              return a.eloRating - b.eloRating;
             } else {
-              return ci_lower_bound(b) - ci_lower_bound(a);
+              return b.eloRating - a.eloRating;
             }
           }
         })
@@ -255,7 +268,7 @@ const SetsLeaderboard = ({leaderboardName, gameHistoryData}) => {
                 {item.winRate}%
               </Text>
               <Text style={styles.tableCell} numberOfLines={1}>
-                {Math.round(item.Score * 100)}
+                {Math.round(item.eloRating)}
               </Text>
             </View>
           ))
@@ -293,6 +306,7 @@ const styles = StyleSheet.create({
     display: 'flex',
     flexDirection: 'row',
     justifyContent: 'space-evenly',
+    alignItems: 'center',
     borderBottomWidth: 1,
     borderColor: colours.accent,
     paddingVertical: 5,
@@ -300,6 +314,13 @@ const styles = StyleSheet.create({
   columnHeader: {
     flex: 1,
     marginHorizontal: 1,
+  },
+  columnHeaderCell: {
+    display: 'flex',
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    gap: 3,
   },
   columnHeaderText: {
     fontSize: 16,

@@ -99,7 +99,7 @@ const Leaderboard = ({leaderboardName, gameHistoryData}) => {
             setSortBy('wins');
             setSortAscending(sortBy !== 'wins' ? false : !sortAscending);
           }}>
-          <Text style={styles.columnHeaderText}>
+          <View style={styles.columnHeaderCell}>
             {sortBy === 'wins' && (
               <FontAwesome5
                 name={
@@ -108,9 +108,8 @@ const Leaderboard = ({leaderboardName, gameHistoryData}) => {
                 color={colours.text}
               />
             )}
-            {sortBy === 'wins' && ' '}
-            Wins
-          </Text>
+            <Text style={styles.columnHeaderText}>Wins</Text>
+          </View>
         </TouchableOpacity>
 
         <TouchableOpacity
@@ -119,7 +118,7 @@ const Leaderboard = ({leaderboardName, gameHistoryData}) => {
             setSortBy('losses');
             setSortAscending(sortBy !== 'losses' ? false : !sortAscending);
           }}>
-          <Text style={styles.columnHeaderText}>
+          <View style={styles.columnHeaderCell}>
             {sortBy === 'losses' && (
               <FontAwesome5
                 name={
@@ -128,9 +127,8 @@ const Leaderboard = ({leaderboardName, gameHistoryData}) => {
                 color={colours.text}
               />
             )}
-            {sortBy === 'losses' && ' '}
-            Losses
-          </Text>
+            <Text style={styles.columnHeaderText}>Losses</Text>
+          </View>
         </TouchableOpacity>
 
         <TouchableOpacity
@@ -139,7 +137,7 @@ const Leaderboard = ({leaderboardName, gameHistoryData}) => {
             setSortBy('winRate');
             setSortAscending(sortBy !== 'winRate' ? false : !sortAscending);
           }}>
-          <Text style={styles.columnHeaderText}>
+          <View style={styles.columnHeaderCell}>
             {sortBy === 'winRate' && (
               <FontAwesome5
                 name={
@@ -148,9 +146,8 @@ const Leaderboard = ({leaderboardName, gameHistoryData}) => {
                 color={colours.text}
               />
             )}
-            {sortBy === 'winRate' && ' '}
-            Win Rate
-          </Text>
+            <Text style={styles.columnHeaderText}>Win Rate</Text>
+          </View>
         </TouchableOpacity>
 
         <TouchableOpacity
@@ -159,7 +156,7 @@ const Leaderboard = ({leaderboardName, gameHistoryData}) => {
             setSortBy('default');
             setSortAscending(sortBy !== 'default' ? false : !sortAscending);
           }}>
-          <Text style={styles.columnHeaderText}>
+          <View style={styles.columnHeaderCell}>
             {sortBy === 'default' && (
               <FontAwesome5
                 name={
@@ -168,9 +165,8 @@ const Leaderboard = ({leaderboardName, gameHistoryData}) => {
                 color={colours.text}
               />
             )}
-            {sortBy === 'default' && ' '}
-            Score
-          </Text>
+            <Text style={styles.columnHeaderText}>Wilson Score</Text>
+          </View>
         </TouchableOpacity>
       </View>
       {gameHistoryData.length === 0 ? (
@@ -269,6 +265,7 @@ const styles = StyleSheet.create({
     display: 'flex',
     flexDirection: 'row',
     justifyContent: 'space-evenly',
+    alignItems: 'center',
     borderBottomWidth: 1,
     borderColor: colours.accent,
     paddingVertical: 5,
@@ -276,6 +273,13 @@ const styles = StyleSheet.create({
   columnHeader: {
     flex: 1,
     paddingHorizontal: 1,
+  },
+  columnHeaderCell: {
+    display: 'flex',
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    gap: 3,
   },
   columnHeaderText: {
     fontSize: 16,

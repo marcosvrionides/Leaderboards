@@ -7,7 +7,7 @@ import LoadingScreen from './LoadingScreen';
 const Leaderboard = ({leaderboardName, gameHistoryData}) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [LeaderboardData, setLeaderboardData] = useState([]);
-  const [sortBy, setSortBy] = useState('default');
+  const [sortBy, setSortBy] = useState('winRate');
   const [sortAscending, setSortAscending] = useState(false);
 
   useEffect(() => {
@@ -150,7 +150,7 @@ const Leaderboard = ({leaderboardName, gameHistoryData}) => {
           </View>
         </TouchableOpacity>
 
-        <TouchableOpacity
+        {/* <TouchableOpacity
           style={styles.columnHeader}
           onPress={() => {
             setSortBy('default');
@@ -167,7 +167,7 @@ const Leaderboard = ({leaderboardName, gameHistoryData}) => {
             )}
             <Text style={styles.columnHeaderText}>Wilson Score</Text>
           </View>
-        </TouchableOpacity>
+        </TouchableOpacity> */}
       </View>
       {gameHistoryData.length === 0 ? (
         <LoadingScreen />
@@ -226,9 +226,9 @@ const Leaderboard = ({leaderboardName, gameHistoryData}) => {
               <Text style={styles.tableCell} numberOfLines={1}>
                 {item.winRate}%
               </Text>
-              <Text style={styles.tableCell} numberOfLines={1}>
+              {/* <Text style={styles.tableCell} numberOfLines={1}>
                 {Math.round(item.Score * 100)}
-              </Text>
+              </Text> */}
             </View>
           ))
       )}

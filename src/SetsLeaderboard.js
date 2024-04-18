@@ -7,7 +7,7 @@ import LoadingScreen from './LoadingScreen';
 const SetsLeaderboard = ({leaderboardName, gameHistoryData}) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [LeaderboardData, setLeaderboardData] = useState([]);
-  const [sortBy, setSortBy] = useState('default');
+  const [sortBy, setSortBy] = useState('winRate');
   const [sortAscending, setSortAscending] = useState(false);
 
   const updatePlayerData = (
@@ -15,6 +15,8 @@ const SetsLeaderboard = ({leaderboardName, gameHistoryData}) => {
     opponent,
     winner,
     leaderboardDataMap,
+    playerScore,
+    opponenScore,
   ) => {
     if (!leaderboardDataMap[playerName]) {
       leaderboardDataMap[playerName] = {
@@ -22,7 +24,7 @@ const SetsLeaderboard = ({leaderboardName, gameHistoryData}) => {
         wins: 0,
         losses: 0,
         winRate: 0,
-        eloRating: 1200, // Initial Elo rating
+        eloRating: 1000, // Initial Elo rating
       };
     }
 
@@ -36,20 +38,22 @@ const SetsLeaderboard = ({leaderboardName, gameHistoryData}) => {
     const playerRating = leaderboardDataMap[playerName].eloRating;
     const opponentName = opponent;
     const opponentRating = (
-      leaderboardDataMap[opponentName] || {eloRating: 1200}
+      leaderboardDataMap[opponentName] || {eloRating: 1000}
     ).eloRating;
     const outcome = winner === playerName ? 1 : 0;
     leaderboardDataMap[playerName].eloRating = calculateElo(
       playerRating,
       opponentRating,
       outcome,
+      playerScore,
+      opponenScore,
     );
   };
 
   useEffect(() => {
     const leaderboardDataMap = {};
 
-    for (const game of gameHistoryData) {
+    for (const game of [...gameHistoryData].reverse()) {
       const {
         player_1_name,
         player_2_name,
@@ -65,12 +69,16 @@ const SetsLeaderboard = ({leaderboardName, gameHistoryData}) => {
         player_2_name,
         winner,
         leaderboardDataMap,
+        player1Wins,
+        player2Wins,
       );
       updatePlayerData(
         player_2_name,
         player_1_name,
         winner,
         leaderboardDataMap,
+        player2Wins,
+        player1Wins,
       );
     }
 
@@ -80,10 +88,6 @@ const SetsLeaderboard = ({leaderboardName, gameHistoryData}) => {
       if (wins + losses > 0) {
         const winRate = (wins / (wins + losses)) * 100;
         leaderboardDataMap[playerName].winRate = Math.round(winRate);
-        // Assuming ci_lower_bound is a defined function
-        leaderboardDataMap[playerName].Score = ci_lower_bound(
-          leaderboardDataMap[playerName],
-        );
       }
     }
 
@@ -91,24 +95,15 @@ const SetsLeaderboard = ({leaderboardName, gameHistoryData}) => {
     setLeaderboardData(tempLeaderboardData);
   }, [gameHistoryData]);
 
-  const ci_lower_bound = player => {
-    if (player.wins + player.losses === 0) {
-      return 0;
-    }
-    const z = 1.96;
-    const n = player.wins + player.losses;
-    const phat = player.wins / n;
-    const score =
-      (phat +
-        (z * z) / (2 * n) -
-        z * Math.sqrt((phat * (1 - phat) + (z * z) / (4 * n)) / n)) /
-      (1 + (z * z) / n);
-    return score;
-  };
-
   // Function to calculate Elo rating
-  const calculateElo = (playerRating, opponentRating, outcome) => {
-    const k = 32; // K-factor, determines the sensitivity of the rating change
+  const calculateElo = (
+    playerRating,
+    opponentRating,
+    outcome,
+    playerScore,
+    opponentScore,
+  ) => {
+    const k = 25; // K-factor, determines the sensitivity of the rating change
     const expectedOutcome =
       1 / (1 + 10 ** ((opponentRating - playerRating) / 400));
 
@@ -191,7 +186,7 @@ const SetsLeaderboard = ({leaderboardName, gameHistoryData}) => {
           </View>
         </TouchableOpacity>
 
-        <TouchableOpacity
+        {/* <TouchableOpacity
           style={styles.columnHeader}
           onPress={() => {
             setSortBy('default');
@@ -208,7 +203,7 @@ const SetsLeaderboard = ({leaderboardName, gameHistoryData}) => {
             )}
             <Text style={styles.columnHeaderText}>Elo</Text>
           </View>
-        </TouchableOpacity>
+        </TouchableOpacity> */}
       </View>
       {gameHistoryData.length === 0 ? (
         <LoadingScreen />
@@ -267,9 +262,9 @@ const SetsLeaderboard = ({leaderboardName, gameHistoryData}) => {
               <Text style={styles.tableCell} numberOfLines={1}>
                 {item.winRate}%
               </Text>
-              <Text style={styles.tableCell} numberOfLines={1}>
+              {/* <Text style={styles.tableCell} numberOfLines={1}>
                 {Math.round(item.eloRating)}
-              </Text>
+              </Text> */}
             </View>
           ))
       )}

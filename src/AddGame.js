@@ -108,7 +108,11 @@ const AddGame = ({navigation, route}) => {
   };
 
   const enterPassword = () => {
-    setModalVisible(true);
+    if (leaderboardPassword) {
+      setModalVisible(true);
+    } else {
+      saveGame();
+    }
   };
 
   const saveGame = async () => {

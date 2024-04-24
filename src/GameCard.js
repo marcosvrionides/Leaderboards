@@ -203,7 +203,8 @@ const GameCard = props => {
               <Text style={styles.player_name}>{game.player_1_name}</Text>
               <Text style={styles.player_score}>
                 {game.player_1_games_won}
-                {game.player_1_games_won > game.player_2_games_won && ' 👑'}
+                {Number(game.player_1_games_won) >
+                  Number(game.player_2_games_won) && ' 👑'}
               </Text>
             </View>
             <Text style={{fontSize: 20, fontWeight: 'bold'}}>-</Text>
@@ -211,7 +212,8 @@ const GameCard = props => {
               <Text style={styles.player_name}>{game.player_2_name}</Text>
               <Text style={styles.player_score}>
                 {game.player_2_games_won}
-                {game.player_1_games_won < game.player_2_games_won && ' 👑'}
+                {Number(game.player_1_games_won) <
+                  Number(game.player_2_games_won) && ' 👑'}
               </Text>
             </View>
           </View>

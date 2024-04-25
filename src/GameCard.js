@@ -81,10 +81,6 @@ const GameCard = props => {
     ToastAndroid.show('Game deleted', ToastAndroid.SHORT);
   };
 
-  if (deleted) {
-    return null;
-  }
-
   // share GameCard view
   const handleShare = () => {
     setFocusView(true);
@@ -186,170 +182,187 @@ const GameCard = props => {
   }, [liked]);
 
   return (
-    <View>
-      {showOptions && (
-        <View style={styles.gameOptionsContainer}>
-          <TouchableOpacity
-            style={styles.deleteGameButton}
-            onPress={() => handleDeleteGame()}>
-            <Text style={styles.deleteGameText}>Delete game</Text>
-          </TouchableOpacity>
-        </View>
-      )}
-      <TouchableWithoutFeedback onPress={() => setFocusView(!focusView)}>
+    <>
+      {deleted ? (
         <View style={styles.container}>
-          <View style={styles.center_view}>
-            <View style={styles.name_score_container} numberOfLines={1}>
-              <Text style={styles.player_name}>{game.player_1_name}</Text>
-              <Text style={styles.player_score}>
-                {game.player_1_games_won}
-                {Number(game.player_1_games_won) >
-                  Number(game.player_2_games_won) && ' 👑'}
-              </Text>
+          <Text style={styles.deleteGameText}>
+            Game deleted. Please refresh to update the scores.
+          </Text>
+        </View>
+      ) : (
+        <View>
+          {showOptions && (
+            <View style={styles.gameOptionsContainer}>
+              <TouchableOpacity
+                style={styles.deleteGameButton}
+                onPress={() => handleDeleteGame()}>
+                <Text style={styles.deleteGameText}>Delete game</Text>
+              </TouchableOpacity>
             </View>
-            <Text style={{fontSize: 20, fontWeight: 'bold'}}>-</Text>
-            <View style={styles.name_score_container} numberOfLines={1}>
-              <Text style={styles.player_name}>{game.player_2_name}</Text>
-              <Text style={styles.player_score}>
-                {game.player_2_games_won}
-                {Number(game.player_1_games_won) <
-                  Number(game.player_2_games_won) && ' 👑'}
-              </Text>
-            </View>
-          </View>
-          {game.media !== undefined || game.note !== undefined ? (
-            <View style={styles.media_container}>
-              <View
-                style={{
-                  width: '100%',
-                  height: 1,
-                  backgroundColor: colors.accent,
-                }}
-              />
-              <View
-                style={{
-                  display: 'flex',
-                  flexDirection: focusView ? 'column' : 'row',
-                  gap: 10,
-                }}>
-                <ViewShot
-                  ref={gameCardRef}
-                  options={{
-                    fileName: 'leaderboards-game-card',
-                    format: 'jpg',
-                    quality: 0.9,
-                  }}>
-                  {game.media !== undefined && mediaUrl !== undefined && (
-                    <Image
-                      style={[
-                        {
-                          aspectRatio:
-                            mediaDimensions.width / mediaDimensions.height,
-                        },
-                        focusView ? styles.media_large : styles.media_small,
-                      ]}
-                      src={mediaUrl}
+          )}
+          <TouchableWithoutFeedback onPress={() => setFocusView(!focusView)}>
+            <View style={styles.container}>
+              <View style={styles.center_view}>
+                <View style={styles.name_score_container} numberOfLines={1}>
+                  <Text style={styles.player_name}>{game.player_1_name}</Text>
+                  <Text style={styles.player_score}>
+                    {game.player_1_games_won}
+                    {Number(game.player_1_games_won) >
+                      Number(game.player_2_games_won) && ' 👑'}
+                  </Text>
+                </View>
+                <Text style={{fontSize: 20, fontWeight: 'bold'}}>-</Text>
+                <View style={styles.name_score_container} numberOfLines={1}>
+                  <Text style={styles.player_name}>{game.player_2_name}</Text>
+                  <Text style={styles.player_score}>
+                    {game.player_2_games_won}
+                    {Number(game.player_1_games_won) <
+                      Number(game.player_2_games_won) && ' 👑'}
+                  </Text>
+                </View>
+              </View>
+              {game.media !== undefined || game.note !== undefined ? (
+                <View style={styles.media_container}>
+                  <View
+                    style={{
+                      width: '100%',
+                      height: 1,
+                      backgroundColor: colors.accent,
+                    }}
+                  />
+                  <View
+                    style={{
+                      display: 'flex',
+                      flexDirection: focusView ? 'column' : 'row',
+                      gap: 10,
+                    }}>
+                    <ViewShot
+                      ref={gameCardRef}
+                      options={{
+                        fileName: 'leaderboards-game-card',
+                        format: 'jpg',
+                        quality: 0.9,
+                      }}>
+                      {game.media !== undefined && mediaUrl !== undefined && (
+                        <Image
+                          style={[
+                            {
+                              aspectRatio:
+                                mediaDimensions.width / mediaDimensions.height,
+                            },
+                            focusView ? styles.media_large : styles.media_small,
+                          ]}
+                          src={mediaUrl}
+                        />
+                      )}
+                      {shareMode && game.media !== undefined && (
+                        <View style={styles.watermark}>
+                          <View
+                            style={[
+                              styles.center_view,
+                              {
+                                backgroundColor: 'rgba(0, 0, 0, 0.5)',
+                                padding: 10,
+                              },
+                            ]}>
+                            <View
+                              style={styles.name_score_container}
+                              numberOfLines={1}>
+                              <Text
+                                style={[styles.player_name, {color: 'white'}]}>
+                                {game.player_1_name}
+                              </Text>
+                              <Text
+                                style={[styles.player_score, {color: 'white'}]}>
+                                {game.player_1_games_won}
+                                {game.player_1_games_won >
+                                  game.player_2_games_won && ' 👑'}
+                              </Text>
+                            </View>
+                            <Text
+                              style={{
+                                fontSize: 20,
+                                fontWeight: 'bold',
+                                color: 'white',
+                              }}>
+                              -
+                            </Text>
+                            <View
+                              style={styles.name_score_container}
+                              numberOfLines={1}>
+                              <Text
+                                style={[styles.player_name, {color: 'white'}]}>
+                                {game.player_2_name}
+                              </Text>
+                              <Text
+                                style={[styles.player_score, {color: 'white'}]}>
+                                {game.player_2_games_won}
+                                {game.player_1_games_won <
+                                  game.player_2_games_won && ' 👑'}
+                              </Text>
+                            </View>
+                          </View>
+                          <View
+                            style={{
+                              backgroundColor: 'rgba(0, 0, 0, 0.5)',
+                              paddingBottom: 10,
+                            }}>
+                            <Text style={styles.appName}>Leaderboards</Text>
+                            <Text style={styles.appAuthor}>
+                              by: Marcos Vrionides
+                            </Text>
+                          </View>
+                        </View>
+                      )}
+                    </ViewShot>
+                    {game.note !== undefined && (
+                      <Text style={styles.note}>{game.note}</Text>
+                    )}
+                  </View>
+                </View>
+              ) : null}
+              <View style={styles.bottomButtonsContainer}>
+                <View style={styles.likesContainer}>
+                  <TouchableWithoutFeedback onPress={() => handleLike()}>
+                    <LottieView
+                      style={styles.heartLottie}
+                      ref={animationRef}
+                      source={require('./assets/Animation.json')}
+                      autoPlay={false}
+                      loop={false}
                     />
-                  )}
-                  {shareMode && game.media !== undefined && (
-                    <View style={styles.watermark}>
-                      <View
-                        style={[
-                          styles.center_view,
-                          {backgroundColor: 'rgba(0, 0, 0, 0.5)', padding: 10},
-                        ]}>
-                        <View
-                          style={styles.name_score_container}
-                          numberOfLines={1}>
-                          <Text style={[styles.player_name, {color: 'white'}]}>
-                            {game.player_1_name}
-                          </Text>
-                          <Text style={[styles.player_score, {color: 'white'}]}>
-                            {game.player_1_games_won}
-                            {game.player_1_games_won >
-                              game.player_2_games_won && ' 👑'}
-                          </Text>
-                        </View>
-                        <Text
-                          style={{
-                            fontSize: 20,
-                            fontWeight: 'bold',
-                            color: 'white',
-                          }}>
-                          -
-                        </Text>
-                        <View
-                          style={styles.name_score_container}
-                          numberOfLines={1}>
-                          <Text style={[styles.player_name, {color: 'white'}]}>
-                            {game.player_2_name}
-                          </Text>
-                          <Text style={[styles.player_score, {color: 'white'}]}>
-                            {game.player_2_games_won}
-                            {game.player_1_games_won <
-                              game.player_2_games_won && ' 👑'}
-                          </Text>
-                        </View>
-                      </View>
-                      <View
-                        style={{
-                          backgroundColor: 'rgba(0, 0, 0, 0.5)',
-                          paddingBottom: 10,
-                        }}>
-                        <Text style={styles.appName}>Leaderboards</Text>
-                        <Text style={styles.appAuthor}>
-                          by: Marcos Vrionides
-                        </Text>
-                      </View>
-                    </View>
-                  )}
-                </ViewShot>
-                {game.note !== undefined && (
-                  <Text style={styles.note}>{game.note}</Text>
+                  </TouchableWithoutFeedback>
+                  <Text style={styles.likeCountText}>{likedCount}</Text>
+                </View>
+                {game.media && (
+                  <TouchableOpacity
+                    style={styles.shareButton}
+                    onPress={() => handleShare()}>
+                    <MaterialCommunityIcons
+                      name={'share'}
+                      size={20}
+                      color={colors.text}
+                    />
+                  </TouchableOpacity>
                 )}
               </View>
+              <Text style={styles.date} numberOfLines={1}>
+                {formatedDate}
+              </Text>
+              {addedByCurrentUser && (
+                <TouchableOpacity
+                  style={styles.options}
+                  onPress={() => setShowOptions(!showOptions)}>
+                  <View style={styles.optionsDot} />
+                  <View style={styles.optionsDot} />
+                  <View style={styles.optionsDot} />
+                </TouchableOpacity>
+              )}
             </View>
-          ) : null}
-          <View style={styles.bottomButtonsContainer}>
-            <View style={styles.likesContainer}>
-              <TouchableWithoutFeedback onPress={() => handleLike()}>
-                <LottieView
-                  style={styles.heartLottie}
-                  ref={animationRef}
-                  source={require('./assets/Animation.json')}
-                  autoPlay={false}
-                  loop={false}
-                />
-              </TouchableWithoutFeedback>
-              <Text style={styles.likeCountText}>{likedCount}</Text>
-            </View>
-            {game.media && (
-              <TouchableOpacity
-                style={styles.shareButton}
-                onPress={() => handleShare()}>
-                <MaterialCommunityIcons
-                  name={'share'}
-                  size={20}
-                  color={colors.text}
-                />
-              </TouchableOpacity>
-            )}
-          </View>
-          <Text style={styles.date} numberOfLines={1}>
-            {formatedDate}
-          </Text>
-          {addedByCurrentUser && (
-            <TouchableOpacity
-              style={styles.options}
-              onPress={() => setShowOptions(!showOptions)}>
-              <View style={styles.optionsDot} />
-              <View style={styles.optionsDot} />
-              <View style={styles.optionsDot} />
-            </TouchableOpacity>
-          )}
+          </TouchableWithoutFeedback>
         </View>
-      </TouchableWithoutFeedback>
-    </View>
+      )}
+    </>
   );
 };
 

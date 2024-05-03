@@ -142,6 +142,7 @@ const styles = StyleSheet.create({
     fontSize: 20,
     color: colours.text,
     padding: 10,
+    maxWidth: '75%',
   },
   backArrow: {
     position: 'absolute',

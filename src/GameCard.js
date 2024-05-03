@@ -233,9 +233,13 @@ const GameCard = props => {
                   <View
                     style={{
                       display: 'flex',
-                      flexDirection: focusView ? 'column' : 'row',
+                      flexDirection: 'column',
                       gap: 10,
+                      width: '100%',
                     }}>
+                    {game.note !== undefined && (
+                      <Text style={styles.note}>{game.note}</Text>
+                    )}
                     <ViewShot
                       ref={gameCardRef}
                       options={{
@@ -315,9 +319,6 @@ const GameCard = props => {
                         </View>
                       )}
                     </ViewShot>
-                    {game.note !== undefined && (
-                      <Text style={styles.note}>{game.note}</Text>
-                    )}
                   </View>
                 </View>
               ) : null}

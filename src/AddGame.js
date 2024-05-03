@@ -11,6 +11,7 @@ import {
   KeyboardAvoidingView,
   ScrollView,
   Modal,
+  Alert,
 } from 'react-native';
 import React, {useState, useEffect, useRef} from 'react';
 import colours from './Colours';
@@ -47,6 +48,9 @@ const AddGame = ({navigation, route}) => {
   const [leaderboardPasswordInput, setLeaderboardPasswordInput] = useState('');
   const [leaderboardPassword, setLeaderboardPassword] = useState('');
   const [wrongPassword, setWrongPassword] = useState(false);
+
+  const [invalidInput1, setInvalidInput1] = useState(false);
+  const [invalidInput2, setInvalidInput2] = useState(false);
 
   const [isModalVisible, setModalVisible] = useState(false);
 
@@ -125,12 +129,9 @@ const AddGame = ({navigation, route}) => {
       ToastAndroid.show('Please fill out all fields.', ToastAndroid.SHORT);
       return;
     }
-    if (
-      !(
-        Number.isInteger(player1GamesWon) === false ||
-        Number.isInteger(player2GamesWon) === false
-      )
-    ) {
+    console.log(player1GamesWon, isNaN(player1GamesWon));
+    console.log(player2GamesWon, isNaN(player2GamesWon));
+    if (isNaN(player1GamesWon) || isNaN(player2GamesWon)) {
       ToastAndroid.show('Invalid input.', ToastAndroid.SHORT);
       return;
     }
@@ -274,6 +275,27 @@ const AddGame = ({navigation, route}) => {
     return () => backHandler.remove();
   }, []);
 
+  const validateScore = (input, player) => {
+    switch (player) {
+      case 1:
+        setPlayer1GamesWon(input);
+        if (isNaN(input)) {
+          setInvalidInput1(true);
+        } else {
+          setInvalidInput1(false);
+        }
+        break;
+      case 2:
+        setPlayer2GamesWon(input);
+        if (isNaN(input)) {
+          setInvalidInput2(true);
+        } else {
+          setInvalidInput2(false);
+        }
+        break;
+    }
+  };
+
   return (
     <TouchableWithoutFeedback
       onPress={() => {
@@ -367,11 +389,14 @@ const AddGame = ({navigation, route}) => {
               />
               <TextInput
                 ref={player1WinsInputRef}
-                style={styles.formInput}
+                style={[
+                  styles.formInput,
+                  invalidInput1 && {borderWidth: 2, borderColor: 'red'},
+                ]}
                 placeholder="Player 1 Games Won"
                 placeholderTextColor={colours.light_text}
                 value={player1GamesWon}
-                onChangeText={number => setPlayer1GamesWon(number)}
+                onChangeText={number => validateScore(number, 1)}
                 keyboardType="numeric"
                 onSubmitEditing={() => handleSwitchInputRef(3)}
                 maxLength={4}
@@ -425,11 +450,14 @@ const AddGame = ({navigation, route}) => {
               />
               <TextInput
                 ref={player2WinsInputRef}
-                style={styles.formInput}
+                style={[
+                  styles.formInput,
+                  invalidInput2 && {borderWidth: 2, borderColor: 'red'},
+                ]}
                 placeholder="Player 2 Games Won"
                 placeholderTextColor={colours.light_text}
                 value={player2GamesWon}
-                onChangeText={number => setPlayer2GamesWon(number)}
+                onChangeText={number => validateScore(number, 2)}
                 keyboardType="numeric"
                 onSubmitEditing={() => handleSwitchInputRef(4)}
                 maxLength={4}

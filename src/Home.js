@@ -15,12 +15,14 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 import {useFocusEffect} from '@react-navigation/native';
 import database from '@react-native-firebase/database';
 import colors from './Colours';
+import LeaderboardChat from './LeaderboardChat';
 
 const Home = ({navigation, route}) => {
   const leaderboard = route.params.leaderboard;
 
   const [gameHistoryData, setGameHistoryData] = useState([]);
   const [noData, setNoData] = useState();
+  const [showChat, setShowChat] = useState(false);
 
   useFocusEffect(
     React.useCallback(() => {
@@ -98,6 +100,10 @@ const Home = ({navigation, route}) => {
             <Text style={styles.addFirstGameText}>Add First Game</Text>
           </TouchableOpacity>
         </View>
+      ) : showChat ? (
+        <View style={styles.chatContainer}>
+          <LeaderboardChat leaderboardName={leaderboard} />
+        </View>
       ) : (
         <View>
           <ScrollView>
@@ -117,6 +123,13 @@ const Home = ({navigation, route}) => {
           </ScrollView>
         </View>
       )}
+      <View style={styles.navBarContainer}>
+        <TouchableOpacity
+          style={styles.navBarItem}
+          onPress={() => setShowChat(!showChat)}>
+          <Text>{showChat ? 'Hide Chat' : 'Show Chat'}</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 };
@@ -193,5 +206,21 @@ const styles = StyleSheet.create({
   addFirstGameText: {
     color: colors.text,
     fontSize: 18,
+  },
+  navBarContainer: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    backgroundColor: colors.accent,
+    display: 'flex',
+    alignItems: 'center',
+  },
+  navBarItem: {
+    backgroundColor: 'rgba(0, 0, 0, 0.1)',
+    padding: 5,
+  },
+  chatContainer: {
+    top: 45,
   },
 });

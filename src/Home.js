@@ -5,6 +5,8 @@ import {
   TouchableOpacity,
   View,
   BackHandler,
+  Modal,
+  TouchableWithoutFeedback,
 } from 'react-native';
 import React, {useEffect, useState} from 'react';
 import colours from './Colours';
@@ -20,7 +22,22 @@ const Home = ({navigation, route}) => {
   const leaderboard = route.params.leaderboard;
 
   const [gameHistoryData, setGameHistoryData] = useState([]);
+  const [filteredGameHistoryData, setFilteredGameHistoryData] = useState([]);
   const [noData, setNoData] = useState();
+
+  const [showFilterModal, setShowFilterModal] = useState(false);
+
+  const [leaderboardPlayers, setLeaderboardPlayers] = useState([]);
+
+  const togglePlayerSelection = playerToUpdate => {
+    setLeaderboardPlayers(
+      leaderboardPlayers.map(player => {
+        return player.playername === playerToUpdate.playername
+          ? {...player, selected: !player.selected}
+          : player;
+      }),
+    );
+  };
 
   useFocusEffect(
     React.useCallback(() => {
@@ -54,6 +71,40 @@ const Home = ({navigation, route}) => {
 
     return () => backHandler.remove();
   }, []);
+
+  const handleFilterByPlayer = () => {
+    //idealy this should be done after a game is added and should be stored in firebase so as not use a lot of processing power ever time a user wants to filter.
+    var players = [];
+    gameHistoryData.forEach(game => {
+      if (!players.some(p => p.playername === game.player_1_name)) {
+        players.push({playername: game.player_1_name, selected: true});
+      }
+      if (!players.some(p => p.playername === game.player_2_name)) {
+        players.push({playername: game.player_2_name, selected: true});
+      }
+    });
+    setLeaderboardPlayers(players);
+    setShowFilterModal(true);
+  };
+
+  useEffect(() => {
+    const selectedPlayers = leaderboardPlayers
+      .filter(player => player.selected)
+      .map(player => player.playername);
+
+    const filteredGames = gameHistoryData.filter(
+      game =>
+        (selectedPlayers.includes(game.player_1_name) &&
+          selectedPlayers.includes(game.player_2_name)) ||
+        (selectedPlayers.includes(game.player_2_name) &&
+          selectedPlayers.includes(game.player_1_name)),
+    );
+
+    setFilteredGameHistoryData(filteredGames);
+  }, [leaderboardPlayers]);
+
+  // console.log(filteredGameHistoryData.length);
+  // console.log(leaderboardPlayers);
 
   return (
     <View style={styles.container}>
@@ -100,19 +151,69 @@ const Home = ({navigation, route}) => {
         </View>
       ) : (
         <View>
+          <Modal
+            visible={showFilterModal}
+            transparent={true}
+            onRequestClose={() => setShowFilterModal(false)}>
+            <TouchableWithoutFeedback onPress={() => setShowFilterModal(false)}>
+              <View style={styles.filterModalContainer}>
+                <TouchableWithoutFeedback>
+                  <View style={styles.filterModal}>
+                    <Text>Filter players:</Text>
+                    <ScrollView vertical>
+                      {leaderboardPlayers.map((player, index) => (
+                        <TouchableOpacity
+                          key={index}
+                          style={styles.playerContainer}
+                          onPress={() => togglePlayerSelection(player)}>
+                          <View
+                            style={[
+                              styles.checkbox,
+                              player.selected && styles.checkboxSelected,
+                            ]}
+                          />
+                          <Text>{player.playername}</Text>
+                        </TouchableOpacity>
+                      ))}
+                    </ScrollView>
+                  </View>
+                </TouchableWithoutFeedback>
+              </View>
+            </TouchableWithoutFeedback>
+          </Modal>
           <ScrollView>
             <View style={{height: 45}} />
+            <View style={styles.filtersContainer}>
+              <Text style={styles.filtersLabel}>Filter:</Text>
+              <TouchableOpacity
+                style={styles.playerFilterButton}
+                onPress={() => handleFilterByPlayer()}>
+                <Text>Players</Text>
+              </TouchableOpacity>
+            </View>
             <SetsLeaderboard
               leaderboardName={leaderboard}
-              gameHistoryData={gameHistoryData}
+              gameHistoryData={
+                leaderboardPlayers.length > 0
+                  ? filteredGameHistoryData
+                  : gameHistoryData
+              }
             />
             <Leaderboard
               leaderboardName={leaderboard}
-              gameHistoryData={gameHistoryData}
+              gameHistoryData={
+                leaderboardPlayers.length > 0
+                  ? filteredGameHistoryData
+                  : gameHistoryData
+              }
             />
             <GameHistory
               leaderboardName={leaderboard}
-              gameHistoryData={gameHistoryData}
+              gameHistoryData={
+                leaderboardPlayers.length > 0
+                  ? filteredGameHistoryData
+                  : gameHistoryData
+              }
             />
           </ScrollView>
         </View>
@@ -193,5 +294,49 @@ const styles = StyleSheet.create({
   addFirstGameText: {
     color: colors.text,
     fontSize: 18,
+  },
+  filtersContainer: {
+    backgroundColor: 'red',
+    height: 50,
+    display: 'flex',
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    position: 'relative',
+  },
+  filtersLabel: {
+    position: 'absolute',
+    height: '100%',
+    textAlignVertical: 'center',
+    backgroundColor: 'green',
+    left: 0,
+    padding: 10,
+  },
+  playerFilterButton: {
+    backgroundColor: 'grey',
+    justifyContent: 'center',
+    padding: 10,
+  },
+  filterModalContainer: {
+    height: '100%',
+  },
+  filterModal: {
+    height: '50%',
+    backgroundColor: 'purple',
+  },
+  checkbox: {
+    width: 20,
+    height: 20,
+    borderWidth: 1,
+    borderColor: '#000',
+    marginRight: 5,
+    borderRadius: 5,
+  },
+  checkboxSelected: {
+    backgroundColor: '#000',
+  },
+  playerContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    margin: 5,
   },
 });

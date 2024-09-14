@@ -103,9 +103,6 @@ const Home = ({navigation, route}) => {
     setFilteredGameHistoryData(filteredGames);
   }, [leaderboardPlayers]);
 
-  // console.log(filteredGameHistoryData.length);
-  // console.log(leaderboardPlayers);
-
   return (
     <View style={styles.container}>
       <View
@@ -159,7 +156,9 @@ const Home = ({navigation, route}) => {
               <View style={styles.filterModalContainer}>
                 <TouchableWithoutFeedback>
                   <View style={styles.filterModal}>
-                    <Text>Filter players:</Text>
+                    <Text style={styles.filterByPlayersInstruction}>
+                      Filter by player names
+                    </Text>
                     <ScrollView vertical>
                       {leaderboardPlayers.map((player, index) => (
                         <TouchableOpacity
@@ -172,7 +171,9 @@ const Home = ({navigation, route}) => {
                               player.selected && styles.checkboxSelected,
                             ]}
                           />
-                          <Text>{player.playername}</Text>
+                          <Text style={styles.playerName}>
+                            {player.playername}
+                          </Text>
                         </TouchableOpacity>
                       ))}
                     </ScrollView>
@@ -188,7 +189,7 @@ const Home = ({navigation, route}) => {
               <TouchableOpacity
                 style={styles.playerFilterButton}
                 onPress={() => handleFilterByPlayer()}>
-                <Text>Players</Text>
+                <Text style={{color: colors.text}}>Players</Text>
               </TouchableOpacity>
             </View>
             <SetsLeaderboard
@@ -296,47 +297,60 @@ const styles = StyleSheet.create({
     fontSize: 18,
   },
   filtersContainer: {
-    backgroundColor: 'red',
     height: 50,
+    marginTop: 5,
     display: 'flex',
     flexDirection: 'row',
     justifyContent: 'flex-end',
-    position: 'relative',
   },
   filtersLabel: {
-    position: 'absolute',
     height: '100%',
     textAlignVertical: 'center',
-    backgroundColor: 'green',
-    left: 0,
     padding: 10,
+    color: colors.text,
   },
   playerFilterButton: {
-    backgroundColor: 'grey',
+    backgroundColor: colors.accent,
     justifyContent: 'center',
     padding: 10,
+    margin: 5,
+    borderRadius: 10,
   },
   filterModalContainer: {
     height: '100%',
+    backgroundColor: colors.translucent_background,
   },
   filterModal: {
-    height: '50%',
-    backgroundColor: 'purple',
+    marginVertical: 100,
+    backgroundColor: colors.secondary,
+    marginHorizontal: 20,
+    padding: 20,
   },
   checkbox: {
     width: 20,
     height: 20,
-    borderWidth: 1,
+    borderWidth: 2,
     borderColor: '#000',
     marginRight: 5,
     borderRadius: 5,
+    backgroundColor: 'red',
   },
   checkboxSelected: {
-    backgroundColor: '#000',
+    backgroundColor: 'green',
   },
   playerContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     margin: 5,
+    backgroundColor: colors.primary,
+    padding: 5,
+  },
+  filterByPlayersInstruction: {
+    color: colors.text,
+    textAlign: 'center',
+    paddingBottom: 10,
+  },
+  playerName: {
+    color: colors.text,
   },
 });

@@ -80,8 +80,8 @@ android {
         applicationId "com.backgammon_leaderboards"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 46
-        versionName "5.5"
+        versionCode 53
+        versionName "6.2"
     }
     signingConfigs {
         debug {

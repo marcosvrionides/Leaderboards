@@ -54,6 +54,8 @@ const AddGame = ({navigation, route}) => {
 
   const [isModalVisible, setModalVisible] = useState(false);
 
+  const [loading, setLoading] = useState(false);
+
   useEffect(() => {
     const leaderboard_ref = database().ref(leaderboard);
     const leaderboard_password_ref = database().ref(
@@ -120,6 +122,10 @@ const AddGame = ({navigation, route}) => {
   };
 
   const saveGame = async () => {
+    if (loading) {
+      return;
+    }
+    setLoading(true);
     if (
       player1Name.trim() === '' ||
       player2Name.trim() === '' ||
@@ -129,8 +135,6 @@ const AddGame = ({navigation, route}) => {
       ToastAndroid.show('Please fill out all fields.', ToastAndroid.SHORT);
       return;
     }
-    console.log(player1GamesWon, isNaN(player1GamesWon));
-    console.log(player2GamesWon, isNaN(player2GamesWon));
     if (isNaN(player1GamesWon) || isNaN(player2GamesWon)) {
       ToastAndroid.show('Invalid input.', ToastAndroid.SHORT);
       return;
@@ -168,7 +172,8 @@ const AddGame = ({navigation, route}) => {
     });
 
     if (gameMedia !== undefined) {
-      uploadMedia(newGameRef.key);
+      await uploadMedia(newGameRef.key);
+      setLoading(false);
     }
 
     const pinnedLeaderboardsRef = database().ref(
@@ -324,7 +329,9 @@ const AddGame = ({navigation, route}) => {
               <TouchableOpacity
                 style={styles.saveButtonContainer}
                 onPress={() => enterPassword()}>
-                <Text style={styles.saveButtonText}>Save</Text>
+                <Text style={styles.saveButtonText}>
+                  {loading ? 'Saving...' : 'Save'}
+                </Text>
               </TouchableOpacity>
             )}
         </View>
@@ -354,7 +361,9 @@ const AddGame = ({navigation, route}) => {
               <TouchableOpacity
                 onPress={saveGame}
                 style={styles.passwordButton}>
-                <Text style={{color: colours.accent}}>Save</Text>
+                <Text style={{color: colours.accent}}>
+                  {loading ? 'Saving...' : 'Save'}
+                </Text>
               </TouchableOpacity>
             </View>
           </View>
